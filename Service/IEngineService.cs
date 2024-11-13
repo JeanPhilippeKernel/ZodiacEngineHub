@@ -4,7 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Panzerfaust.Models
+namespace Panzerfaust.Service
 {
-    public record ListItemTemplate(Type ModelType, string IconKey, string Label);
+    public interface IEngineService
+    {
+        Task StartAsync(string path);
+    }
 }

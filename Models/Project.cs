@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,25 +10,28 @@ namespace Panzerfaust.Models
 {
     public class Project
     {
-        [JsonProperty("projectName")]
-        public string ProjectName { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Fullpath { get; set; } = string.Empty;
+        public DateTime CreationDate { get; set; }
+        public DateTime UpdateDate { get; set; }
 
-        [JsonProperty("version")]
-        public string Version { get; set; }
 
-        [JsonProperty("workingSpace")]
-        public string WorkingSpace { get; set; }
+        public string GetHash()
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                // Convert the input string to a byte array and compute the hash
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(Name));
 
-        [JsonProperty("defaultImportDir")]
-        public DefaultImportDir DefaultImportDir { get; set; }
+                // Convert the byte array to a hexadecimal string
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in bytes)
+                {
+                    sb.Append(b.ToString("x2")); // Format byte as hex
+                }
 
-        [JsonProperty("sceneDir")]
-        public string SceneDir { get; set; }
-
-        [JsonProperty("sceneDataDir")]
-        public string SceneDataDir { get; set; }
-
-        [JsonProperty("sceneList")]
-        public IList<SceneList> SceneList { get; set; }
+                return sb.ToString();
+            }
+        }
     }
 }
