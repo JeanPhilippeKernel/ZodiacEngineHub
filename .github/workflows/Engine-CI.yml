@@ -1,18 +1,18 @@
-name: Engine CI
+name: Panzerfaust CI
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ master, develop ]
+    branches: [main, develop]
   workflow_dispatch:
     inputs:
       run_debug:
-        description: 'Build and test Debug'
+        description: 'Build Debug'
         type: boolean
         default: true
       run_release:
-        description: 'Build and test Release'
+        description: 'Build Release'
         type: boolean
         default: false
       run_deploy:
@@ -25,16 +25,8 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/job-commitlint.yml
 
-  clang-format:
-    strategy:
-      matrix:
-        directories: [ZEngine, Tetragrama, Obelisk, Resources/Shaders]
-    uses: ./.github/workflows/job-clangformat.yml
-    with:
-      srcDirectory: ${{ matrix.directories }}
-
   windows:
-    needs: [commitlint, clang-format]
+    needs: commitlint
     if: ${{ !failure() && !cancelled() }}
     uses: ./.github/workflows/windows-build.yml
     with:
@@ -44,7 +36,7 @@ jobs:
       run_deploy: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && fromJSON(inputs.run_deploy)) }}
 
   macOS:
-    needs: [commitlint, clang-format]
+    needs: commitlint
     if: ${{ !failure() && !cancelled() }}
     uses: ./.github/workflows/macOS-build.yml
     with:
@@ -54,7 +46,7 @@ jobs:
       run_deploy: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && fromJSON(inputs.run_deploy)) }}
 
   linux:
-    needs: [commitlint, clang-format]
+    needs: commitlint
     if: ${{ !failure() && !cancelled() }}
     uses: ./.github/workflows/linux-build.yml
     with:

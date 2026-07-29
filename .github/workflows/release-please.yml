@@ -89,17 +89,17 @@ jobs:
                   VERSION="${{ needs.release-please.outputs.tag_name }}"
                   VERSION="${VERSION#v}"
                   cd artifacts
-                  zip -r "ZEngine-${VERSION}-Windows-x64.zip"    Windows-x64-Release/
-                  zip -r "ZEngine-${VERSION}-macOS-x64.zip"      macOS-x64-Release/
-                  zip -r "ZEngine-${VERSION}-macOS-arm64.zip"    macOS-arm64-Release/
-                  tar -czf "ZEngine-${VERSION}-Linux-x64.tar.gz" linux-Release/
+                  zip -r "Panzerfaust-${VERSION}-Windows-x64.zip"    Windows-x64-Release/
+                  zip -r "Panzerfaust-${VERSION}-macOS-x64.zip"      macOS-x64-Release/
+                  zip -r "Panzerfaust-${VERSION}-macOS-arm64.zip"    macOS-arm64-Release/
+                  tar -czf "Panzerfaust-${VERSION}-Linux-x64.tar.gz" linux-Release/
 
             - name: Upload to GitHub Release
               uses: softprops/action-gh-release@v2
               with:
                   tag_name: ${{ needs.release-please.outputs.tag_name }}
                   files: |
-                      artifacts/ZEngine-*-Windows-x64.zip
-                      artifacts/ZEngine-*-macOS-x64.zip
-                      artifacts/ZEngine-*-macOS-arm64.zip
-                      artifacts/ZEngine-*-Linux-x64.tar.gz
+                      artifacts/Panzerfaust-*-Windows-x64.zip
+                      artifacts/Panzerfaust-*-macOS-x64.zip
+                      artifacts/Panzerfaust-*-macOS-arm64.zip
+                      artifacts/Panzerfaust-*-Linux-x64.tar.gz
