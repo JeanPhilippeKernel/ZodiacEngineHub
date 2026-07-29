@@ -29,6 +29,7 @@ jobs:
             --framework ${{ inputs.targetFramework }} `
             --runtime win-x64 `
             --self-contained true `
+            -p:PublishSingleFile=true `
             --output Result.Windows.x64.${{ inputs.configuration }}/bin
 
       - name: Upload artifact
