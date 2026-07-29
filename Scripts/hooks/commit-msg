@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+# commit-msg: validates commit message against conventional commits format.
+# Mirrors the job-commitlint.yml CI check so violations are caught locally.
+
+COMMIT_MSG_FILE="$1"
+COMMIT_MSG="$(cat "$COMMIT_MSG_FILE")"
+
+PATTERN="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .{1,100}"
+
+if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+    echo ""
+    echo "[commit-msg] Commit message does not follow conventional commits format."
+    echo "[commit-msg] Expected: <type>(<scope>): <subject>"
+    echo "[commit-msg] Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+    echo "[commit-msg] Example: feat(assets): add local asset delete confirmation"
+    echo ""
+    exit 1
+fi
+
+exit 0
