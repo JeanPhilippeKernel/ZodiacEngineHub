@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-debug",
+      "program": "${workspaceFolder}/bin/Debug/net10.0/Panzerfaust.dll",
+      "windows": {
+        "program": "${workspaceFolder}/../Result.Windows.x64.MultiConfig/Debug/net10.0/Panzerfaust.dll"
+      },
+      "osx": {
+        "program": "${workspaceFolder}/bin/Debug/net10.0/Panzerfaust.dll"
+      },
+      "linux": {
+        "program": "${workspaceFolder}/bin/Debug/net10.0/Panzerfaust.dll"
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "env": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "Attach to process",
+      "type": "coreclr",
+      "request": "attach"
+    }
+  ]
+}

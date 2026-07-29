@@ -778,14 +778,14 @@
                 <StackPanel Spacing="4"
                             IsVisible="{Binding SelectedRelease, Converter={x:Static ObjectConverters.IsNotNull}}">
                   <TextBlock Text="Selected:" FontSize="11" Opacity="0.5"/>
-                  <TextBlock Text="{Binding SelectedRelease.DisplayName}" FontSize="13" FontWeight="SemiBold"/>
-                  <TextBlock Text="{Binding SelectedRelease.PlatformDownloadUrl}"
+                  <TextBlock Text="{Binding SelectedRelease.DisplayName, FallbackValue=''}" FontSize="13" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding SelectedRelease.PlatformDownloadUrl, FallbackValue=''}"
                              FontSize="11" Opacity="0.5"
                              TextWrapping="Wrap"
-                             IsVisible="{Binding SelectedRelease.PlatformDownloadUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                             IsVisible="{Binding SelectedRelease.PlatformDownloadUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}, FallbackValue=False}"/>
                   <TextBlock Text="No asset available for this platform."
                              FontSize="11" Opacity="0.4"
-                             IsVisible="{Binding SelectedRelease.PlatformDownloadUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"/>
+                             IsVisible="{Binding SelectedRelease.PlatformDownloadUrl, Converter={x:Static StringConverters.IsNullOrEmpty}, FallbackValue=False}"/>
                 </StackPanel>
               </StackPanel>
             </Border>
@@ -828,17 +828,17 @@
 
             <Panel Height="160" ClipToBounds="True">
               <Border CornerRadius="8" ClipToBounds="True" Background="{DynamicResource ThumbnailPlaceholderBackground}"
-                      IsVisible="{Binding SelectedProject.ThumbnailPath, Converter={StaticResource NullToHidden}}">
+                      IsVisible="{Binding SelectedProject.ThumbnailPath, Converter={StaticResource NullToHidden}, FallbackValue=True}">
                 <PathIcon Data="{StaticResource folder_regular}" Width="48" Height="48"
                           Opacity="0.2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
               </Border>
               <Border CornerRadius="8" ClipToBounds="True"
-                      IsVisible="{Binding SelectedProject.ThumbnailPath, Converter={StaticResource NullToVisible}}">
-                <Image Source="{Binding SelectedProject.ThumbnailPath}" Stretch="UniformToFill"/>
+                      IsVisible="{Binding SelectedProject.ThumbnailPath, Converter={StaticResource NullToVisible}, FallbackValue=False}">
+                <Image Source="{Binding SelectedProject.ThumbnailPath, FallbackValue={x:Null}}" Stretch="UniformToFill"/>
               </Border>
             </Panel>
 
-            <TextBlock Text="{Binding SelectedProject.Name}"
+            <TextBlock Text="{Binding SelectedProject.Name, FallbackValue=''}"
                        FontSize="16" FontWeight="Bold" TextWrapping="Wrap"/>
 
             <Border Background="{DynamicResource SettingsGroupBackground}" CornerRadius="8" Padding="14,12">
@@ -846,22 +846,22 @@
 
                 <Grid ColumnDefinitions="Auto, *">
                   <TextBlock Grid.Column="0" Text="Created" FontSize="12" Opacity="0.5" Width="90"/>
-                  <TextBlock Grid.Column="1" Text="{Binding SelectedProject.CreatedDate}" FontSize="12" TextWrapping="Wrap"/>
+                  <TextBlock Grid.Column="1" Text="{Binding SelectedProject.CreatedDate, FallbackValue=''}" FontSize="12" TextWrapping="Wrap"/>
                 </Grid>
 
                 <Grid ColumnDefinitions="Auto, *">
                   <TextBlock Grid.Column="0" Text="Last updated" FontSize="12" Opacity="0.5" Width="90"/>
-                  <TextBlock Grid.Column="1" Text="{Binding SelectedProject.UpdatedDate}" FontSize="12" TextWrapping="Wrap"/>
+                  <TextBlock Grid.Column="1" Text="{Binding SelectedProject.UpdatedDate, FallbackValue=''}" FontSize="12" TextWrapping="Wrap"/>
                 </Grid>
 
                 <Grid ColumnDefinitions="Auto, *">
                   <TextBlock Grid.Column="0" Text="Size" FontSize="12" Opacity="0.5" Width="90"/>
-                  <TextBlock Grid.Column="1" Text="{Binding SelectedProject.ProjectSize}" FontSize="12"/>
+                  <TextBlock Grid.Column="1" Text="{Binding SelectedProject.ProjectSize, FallbackValue=''}" FontSize="12"/>
                 </Grid>
 
                 <Grid ColumnDefinitions="Auto, *">
                   <TextBlock Grid.Column="0" Text="Path" FontSize="12" Opacity="0.5" Width="90"/>
-                  <TextBlock Grid.Column="1" Text="{Binding SelectedProject.Path}" FontSize="12"
+                  <TextBlock Grid.Column="1" Text="{Binding SelectedProject.Path, FallbackValue=''}" FontSize="12"
                              TextWrapping="Wrap" Opacity="0.7"/>
                 </Grid>
 
@@ -872,7 +872,7 @@
               <Button Content="Open" HorizontalAlignment="Stretch"
                       HorizontalContentAlignment="Center" CornerRadius="6"
                       Background="#0078D4" Foreground="White"
-                      Command="{Binding SelectedProject.OpenProjectCommand}"/>
+                      Command="{Binding SelectedProject.OpenProjectCommand, FallbackValue={x:Null}}"/>
             </StackPanel>
 
           </StackPanel>
