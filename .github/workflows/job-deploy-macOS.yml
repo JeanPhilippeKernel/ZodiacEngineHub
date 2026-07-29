@@ -1,6 +1,4 @@
-# Deploy for macOS
-#
-name: macOS Deploy Workflow
+name: macOS Deploy Job
 
 on:
   workflow_call:
@@ -18,18 +16,15 @@ on:
 jobs:
   deploy:
     name: deploy-macOS-${{ inputs.architecture }}-${{ inputs.configuration }}
-    runs-on: ${{ inputs.architecture == 'x64' && 'macos-15-intel' || 'macos-latest' }}
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v4
         with:
-          path: Result.Darwin.${{ inputs.architecture }}.${{ inputs.configuration }}
-          name: Build-macOS-${{ inputs.architecture }}-Release
+          name: Build-macOS-${{ inputs.architecture }}-${{ inputs.configuration }}
+          path: artifacts/macOS-${{ inputs.architecture }}
 
-      - name: Publish Artifacts
-        uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v4
         with:
           name: macOS-${{ inputs.architecture }}-${{ inputs.configuration }}
           if-no-files-found: error
-          path: |
-            Result.Darwin.${{inputs.architecture}}.${{ inputs.configuration }}/bin/
-            Result.Darwin.${{inputs.architecture}}.${{ inputs.configuration }}/lib/
+          path: artifacts/macOS-${{ inputs.architecture }}

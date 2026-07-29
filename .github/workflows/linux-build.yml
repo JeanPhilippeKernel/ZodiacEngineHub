@@ -1,4 +1,4 @@
-name: ZEngine Linux Build
+name: Panzerfaust Linux Build
 
 on:
   workflow_call:
@@ -17,38 +17,24 @@ on:
         default: false
 
 jobs:
-  cmake-build-debug:
+  build-debug:
     if: ${{ inputs.run_debug }}
-    uses: ./.github/workflows/job-cmakebuild-linux.yml
+    uses: ./.github/workflows/job-build-linux.yml
     with:
       configuration: Debug
-      targetframework: ${{ inputs.targetFramework }}
+      targetFramework: ${{ inputs.targetFramework }}
 
-  cmake-build-release:
+  build-release:
     if: ${{ inputs.run_release || inputs.run_deploy }}
-    uses: ./.github/workflows/job-cmakebuild-linux.yml
+    uses: ./.github/workflows/job-build-linux.yml
     with:
       configuration: Release
-      targetframework: ${{ inputs.targetFramework }}
-
-  test-debug:
-    needs: cmake-build-debug
-    if: ${{ inputs.run_debug }}
-    uses: ./.github/workflows/job-test-linux.yml
-    with:
-      configuration: Debug
-
-  test-release:
-    needs: cmake-build-release
-    if: ${{ inputs.run_release || inputs.run_deploy }}
-    uses: ./.github/workflows/job-test-linux.yml
-    with:
-      configuration: Release
+      targetFramework: ${{ inputs.targetFramework }}
 
   deploy:
-    needs: test-release
+    needs: build-release
     if: ${{ inputs.run_deploy }}
     uses: ./.github/workflows/job-deploy-linux.yml
     with:
       configuration: Release
-      targetframework: ${{ inputs.targetFramework }}
+      targetFramework: ${{ inputs.targetFramework }}

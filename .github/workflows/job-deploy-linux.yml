@@ -1,6 +1,4 @@
-# Deploy for linux
-#
-name: linux Deploy Workflow
+name: Linux Deploy Job
 
 on:
   workflow_call:
@@ -14,19 +12,16 @@ on:
 
 jobs:
   deploy:
-    name: deploy-linux-${{ inputs.configuration }}
-    runs-on: ubuntu-24.04
+    name: deploy-linux-x64-${{ inputs.configuration }}
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v4
         with:
-          name: Build-linux-Release
-          path: Result.Linux.x64.${{ inputs.configuration }}
+          name: Build-linux-x64-${{ inputs.configuration }}
+          path: artifacts/linux-x64
 
-      - name: Publish Artifacts
-        uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v4
         with:
           name: linux-${{ inputs.configuration }}
           if-no-files-found: error
-          path: |
-            Result.Linux.x64.${{inputs.configuration}}/bin
-            Result.Linux.x64.${{inputs.configuration}}/lib
+          path: artifacts/linux-x64
