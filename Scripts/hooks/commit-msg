@@ -5,6 +5,9 @@
 COMMIT_MSG_FILE="$1"
 COMMIT_MSG="$(cat "$COMMIT_MSG_FILE")"
 
+# Skip merge and sync commits
+echo "$COMMIT_MSG" | grep -qE "^(Merge|Sync/)" && exit 0
+
 PATTERN="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .{1,100}"
 
 if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
