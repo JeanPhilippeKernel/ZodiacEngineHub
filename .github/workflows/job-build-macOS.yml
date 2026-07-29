@@ -1,0 +1,42 @@
+name: macOS Build Job
+
+on:
+  workflow_call:
+    inputs:
+      targetFramework:
+        type: string
+        required: true
+      configuration:
+        type: string
+        default: 'Debug'
+      architecture:
+        type: string
+        default: 'x64'
+
+jobs:
+  build:
+    name: build-macOS-${{ inputs.architecture }}-${{ inputs.configuration }}
+    runs-on: ${{ inputs.architecture == 'x64' && 'macos-15-intel' || 'macos-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Publish
+        run: |
+          dotnet publish Panzerfaust.csproj \
+            --configuration ${{ inputs.configuration }} \
+            --framework ${{ inputs.targetFramework }} \
+            --runtime osx-${{ inputs.architecture }} \
+            --self-contained true \
+            --output Result.Darwin.${{ inputs.architecture }}.${{ inputs.configuration }}/bin
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build-macOS-${{ inputs.architecture }}-${{ inputs.configuration }}
+          path: Result.Darwin.${{ inputs.architecture }}.${{ inputs.configuration }}/bin
+          if-no-files-found: error

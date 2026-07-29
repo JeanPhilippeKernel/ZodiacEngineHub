@@ -2,7 +2,7 @@ name: Publish Pre-release
 
 on:
   workflow_run:
-    workflows: ["Engine CI"]
+    workflows: ["Panzerfaust CI"]
     branches: [develop]
     types: [completed]
 
@@ -44,7 +44,7 @@ jobs:
 
       - name: Download Windows artifact
         if: steps.check-tag.outputs.skipped != 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v4
         with:
           name: Windows-x64-Release
           run-id: ${{ github.event.workflow_run.id }}
@@ -53,7 +53,7 @@ jobs:
 
       - name: Download macOS x64 artifact
         if: steps.check-tag.outputs.skipped != 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v4
         with:
           name: macOS-x64-Release
           run-id: ${{ github.event.workflow_run.id }}
@@ -62,7 +62,7 @@ jobs:
 
       - name: Download macOS arm64 artifact
         if: steps.check-tag.outputs.skipped != 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v4
         with:
           name: macOS-arm64-Release
           run-id: ${{ github.event.workflow_run.id }}
@@ -71,7 +71,7 @@ jobs:
 
       - name: Download Linux artifact
         if: steps.check-tag.outputs.skipped != 'true'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v4
         with:
           name: linux-Release
           run-id: ${{ github.event.workflow_run.id }}
@@ -83,10 +83,10 @@ jobs:
         run: |
           VERSION="${{ steps.check-tag.outputs.version }}"
           cd artifacts
-          zip -r "ZEngine-${VERSION}-Windows-x64.zip"    Windows-x64-Release/
-          zip -r "ZEngine-${VERSION}-macOS-x64.zip"      macOS-x64-Release/
-          zip -r "ZEngine-${VERSION}-macOS-arm64.zip"    macOS-arm64-Release/
-          tar -czf "ZEngine-${VERSION}-Linux-x64.tar.gz" linux-Release/
+          zip -r "Panzerfaust-${VERSION}-Windows-x64.zip"    Windows-x64-Release/
+          zip -r "Panzerfaust-${VERSION}-macOS-x64.zip"      macOS-x64-Release/
+          zip -r "Panzerfaust-${VERSION}-macOS-arm64.zip"    macOS-arm64-Release/
+          tar -czf "Panzerfaust-${VERSION}-Linux-x64.tar.gz" linux-Release/
 
       - name: Publish GitHub Pre-release
         if: steps.check-tag.outputs.skipped != 'true'
@@ -98,7 +98,7 @@ jobs:
           generate_release_notes: false
           body_path: /tmp/release-notes.md
           files: |
-            artifacts/ZEngine-${{ steps.check-tag.outputs.version }}-Windows-x64.zip
-            artifacts/ZEngine-${{ steps.check-tag.outputs.version }}-macOS-x64.zip
-            artifacts/ZEngine-${{ steps.check-tag.outputs.version }}-macOS-arm64.zip
-            artifacts/ZEngine-${{ steps.check-tag.outputs.version }}-Linux-x64.tar.gz
+            artifacts/Panzerfaust-${{ steps.check-tag.outputs.version }}-Windows-x64.zip
+            artifacts/Panzerfaust-${{ steps.check-tag.outputs.version }}-macOS-x64.zip
+            artifacts/Panzerfaust-${{ steps.check-tag.outputs.version }}-macOS-arm64.zip
+            artifacts/Panzerfaust-${{ steps.check-tag.outputs.version }}-Linux-x64.tar.gz

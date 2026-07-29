@@ -1,4 +1,4 @@
-name: ZEngine Window Build
+name: Panzerfaust Windows Build
 
 on:
   workflow_call:
@@ -17,36 +17,22 @@ on:
         default: false
 
 jobs:
-  cmake-build-debug:
+  build-debug:
     if: ${{ inputs.run_debug }}
-    uses: ./.github/workflows/job-cmakebuild-windows.yml
+    uses: ./.github/workflows/job-build-windows.yml
     with:
       configuration: Debug
       targetFramework: ${{ inputs.targetFramework }}
 
-  cmake-build-release:
+  build-release:
     if: ${{ inputs.run_release || inputs.run_deploy }}
-    uses: ./.github/workflows/job-cmakebuild-windows.yml
+    uses: ./.github/workflows/job-build-windows.yml
     with:
       configuration: Release
       targetFramework: ${{ inputs.targetFramework }}
-
-  test-debug:
-    needs: cmake-build-debug
-    if: ${{ inputs.run_debug }}
-    uses: ./.github/workflows/job-test-windows.yml
-    with:
-      configuration: Debug
-
-  test-release:
-    needs: cmake-build-release
-    if: ${{ inputs.run_release || inputs.run_deploy }}
-    uses: ./.github/workflows/job-test-windows.yml
-    with:
-      configuration: Release
 
   deploy:
-    needs: test-release
+    needs: build-release
     if: ${{ inputs.run_deploy }}
     uses: ./.github/workflows/job-deploy-windows.yml
     with:

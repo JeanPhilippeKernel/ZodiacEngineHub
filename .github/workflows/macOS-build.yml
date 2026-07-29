@@ -1,4 +1,4 @@
-name: ZEngine macOS Build
+name: Panzerfaust macOS Build
 
 on:
   workflow_call:
@@ -17,52 +17,30 @@ on:
         default: false
 
 jobs:
-  cmake-build-debug:
+  build-debug:
     if: ${{ inputs.run_debug }}
     strategy:
       matrix:
         architecture: [x64, arm64]
-    uses: ./.github/workflows/job-cmakebuild-macOS.yml
+    uses: ./.github/workflows/job-build-macOS.yml
     with:
       configuration: Debug
       architecture: ${{ matrix.architecture }}
       targetFramework: ${{ inputs.targetFramework }}
 
-  cmake-build-release:
+  build-release:
     if: ${{ inputs.run_release || inputs.run_deploy }}
     strategy:
       matrix:
         architecture: [x64, arm64]
-    uses: ./.github/workflows/job-cmakebuild-macOS.yml
+    uses: ./.github/workflows/job-build-macOS.yml
     with:
       configuration: Release
       architecture: ${{ matrix.architecture }}
       targetFramework: ${{ inputs.targetFramework }}
-
-  test-debug:
-    needs: cmake-build-debug
-    if: ${{ inputs.run_debug }}
-    strategy:
-      matrix:
-        architecture: [x64, arm64]
-    uses: ./.github/workflows/job-test-macOS.yml
-    with:
-      configuration: Debug
-      architecture: ${{ matrix.architecture }}
-
-  test-release:
-    needs: cmake-build-release
-    if: ${{ inputs.run_release || inputs.run_deploy }}
-    strategy:
-      matrix:
-        architecture: [x64, arm64]
-    uses: ./.github/workflows/job-test-macOS.yml
-    with:
-      configuration: Release
-      architecture: ${{ matrix.architecture }}
 
   deploy:
-    needs: test-release
+    needs: build-release
     if: ${{ inputs.run_deploy }}
     strategy:
       matrix:
