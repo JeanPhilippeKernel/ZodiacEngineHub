@@ -29,7 +29,7 @@ Panzerfaust uses [Conventional Commits](https://www.conventionalcommits.org/en/v
 ```
 
 - **type** — required, lowercase (see table below)
-- **scope** — optional, lowercase, names the subsystem affected (e.g. `rendering`, `vulkan`, `camera`, `memory`, `ci`)
+- **scope** — optional, lowercase, names the subsystem affected (e.g. `engine`, `project`, `assets`, `download`, `ui`, `ci`)
 - **subject** — required, imperative mood, no trailing period, max 100 characters total for the header
 - **body** — free prose; wrap at 72 characters; separate from subject with a blank line
 - **footer** — key: value pairs; `BREAKING CHANGE: <description>` triggers a major version bump
@@ -38,7 +38,7 @@ Panzerfaust uses [Conventional Commits](https://www.conventionalcommits.org/en/v
 
 | Type | When to use | Version bump |
 |---|---|---|
-| `feat` | A new feature visible to users or engine consumers | minor (`0.3.0` → `0.4.0`) |
+| `feat` | A new feature visible to users | minor (`0.3.0` → `0.4.0`) |
 | `fix` | A bug fix | patch (`0.3.0` → `0.3.1`) |
 | `perf` | A performance improvement with no API change | patch |
 | `refactor` | Code restructuring with no behaviour or API change | patch |
@@ -55,30 +55,28 @@ A `!` suffix on any type (e.g. `feat!:`) or a `BREAKING CHANGE:` footer triggers
 ### Examples
 
 ```
-feat(rendering): add indirect draw support for mesh batches
+feat(engine): add engine version filtering in settings
 ```
 
 ```
-fix(vulkan): correct semaphore leak on swapchain recreation
+fix(download): correct progress percentage not resetting between downloads
 ```
 
 ```
-perf(memory): replace per-frame heap alloc with arena in render loop
+perf(assets): lazy-load local asset list on tab activation
 ```
 
 ```
-feat!: remove legacy OpenGL backend
+feat!: remove support for zip engine packages
 
-BREAKING CHANGE: the OpenGL renderer has been removed. Vulkan is now
-the only supported backend. Update your application startup code to
-remove any OpenGL-specific initialisation.
+BREAKING CHANGE: only tar.gz engine packages are supported. Existing
+zip-based engine installations must be re-downloaded.
 ```
 
 ```
-refactor(camera): extract projection logic into CameraUtils
+refactor(project): extract project validation into ProjectValidator
 
-No behaviour change. Simplifies FlyCamera and OrbitCamera by sharing
-the common frustum calculation.
+No behaviour change. Simplifies ProjectService by separating validation logic.
 ```
 
 ### What happens if a commit message is wrong
@@ -97,7 +95,7 @@ This installs a `commit-msg` hook that validates conventional commits format loc
 
 ## Release Process
 
-ZEngine has two release tracks, both fully automated from commit messages.
+Panzerfaust has two release tracks, both fully automated from commit messages.
 
 ### Stable releases (`main`)
 
@@ -128,9 +126,8 @@ Once `develop` is stable enough to ship:
 
 1. Make sure your modification is covered by the rules above and discussed in an issue first.
 
-2. Update the README.md with details of changes to the interface, including new environment
-   variables, exposed ports, useful file locations and container parameters.
+2. Update `README.md` if your change affects user-facing behaviour, install steps, or configuration.
 
-3. You may merge the Pull Request once you have the sign-off of two other developers, or if you
-   do not have permission to do that, you may request the second reviewer to merge it for you.
+3. You may merge the Pull Request once you have the sign-off of at least one other developer, or if you
+   do not have permission to do that, you may request a reviewer to merge it for you.
 
