@@ -1,0 +1,39 @@
+name: Windows Build Job
+
+on:
+  workflow_call:
+    inputs:
+      targetFramework:
+        type: string
+        required: true
+      configuration:
+        type: string
+        default: 'Debug'
+
+jobs:
+  build:
+    name: build-windows-x64-${{ inputs.configuration }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Publish
+        run: |
+          dotnet publish Panzerfaust.csproj `
+            --configuration ${{ inputs.configuration }} `
+            --framework ${{ inputs.targetFramework }} `
+            --runtime win-x64 `
+            --self-contained true `
+            --output Result.Windows.x64.${{ inputs.configuration }}/bin
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build-Windows-x64-${{ inputs.configuration }}
+          path: Result.Windows.x64.${{ inputs.configuration }}/bin
+          if-no-files-found: error
