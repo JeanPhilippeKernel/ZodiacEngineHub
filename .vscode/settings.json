@@ -1,0 +1,44 @@
+{
+  // Editor
+  "editor.formatOnSave": true,
+  "editor.rulers": [120],
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.inlayHints.enabled": "on",
+
+  // C# / OmniSharp
+  "dotnet.defaultSolution": "Panzerfaust.csproj",
+  "omnisharp.enableRoslynAnalyzers": true,
+  "omnisharp.enableEditorConfigSupport": true,
+  "csharp.debug.console": "internalConsole",
+
+  // C# Dev Kit
+  "dotnet.unitTests.runSettingsPath": "",
+  "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+
+  // File associations
+  "files.associations": {
+    "*.axaml": "xml"
+  },
+
+  // XML (for .axaml files)
+  "xml.format.enabled": true,
+  "xml.format.splitAttributes": "alignWithFirstAttr",
+  "xml.validation.enabled": false,
+
+  // Exclude noise from explorer
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true
+  },
+
+  // Search exclusions
+  "search.exclude": {
+    "**/bin": true,
+    "**/obj": true
+  },
+
+  // Terminal
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "dotnet.formatting.organizeImportsOnFormat": true
+}

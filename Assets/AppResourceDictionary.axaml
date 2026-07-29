@@ -11,8 +11,8 @@
   <conv:NullToVisibilityConverter x:Key="NullToVisible"/>
   <conv:NullToVisibilityConverter x:Key="NullToHidden" IsInverse="True"/>
   <conv:BoolToDoubleConverter x:Key="BoolToOpacity"/>
-  <conv:BoolToTransformConverter x:Key="ToastTransform" TrueValue="translateY(0)" FalseValue="translateY(20)"/>
-  <conv:BoolToTransformConverter x:Key="TaskPanelTransform" TrueValue="translateY(0)" FalseValue="translateY(10)"/>
+  <conv:BoolToTransformConverter x:Key="ToastTransform" TrueValue="translateY(0px)" FalseValue="translateY(20px)"/>
+  <conv:BoolToTransformConverter x:Key="TaskPanelTransform" TrueValue="translateY(0px)" FalseValue="translateY(10px)"/>
 
 
   <ResourceDictionary.ThemeDictionaries>
