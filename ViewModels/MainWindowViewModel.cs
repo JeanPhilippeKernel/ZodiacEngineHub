@@ -81,6 +81,12 @@ namespace Panzerfaust.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _projectCount, value);
         }
 
+        public string AppVersion { get; } =
+            System.Reflection.Assembly.GetExecutingAssembly()
+                .GetName().Version is { } v
+                ? $"v{v.Major}.{v.Minor}.{v.Build}"
+                : "v?";
+
         private string _statusBarMessage = string.Empty;
         public string StatusBarMessage
         {
