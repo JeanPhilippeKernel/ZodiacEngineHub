@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.2.0](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.1.0...v1.2.0) (2026-07-29)
+
+
+### Features
+
+* **panzerfaust:** add search support allowing user to find projet by name ([#399](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/399)) ([#447](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/447)) ([69822bc](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/69822bcd05a78fdef78cfae0db3fc9aad7b46814))
+* **panzerfaust:** build launcher UI with engine management, assets, and project workflow ([#554](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/554)) ([739b6af](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/739b6aff41ff533884e8a89c942978070fe062f8))
+
+
+### Build System
+
+* remove _WIN32/__MACOS__ defines, fix OutputType to Exe ([be9def5](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/be9def5c8e7b63292c84296e9eff7a021f685f0e))
+* restore OutputType to WinExe ([2790a13](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/2790a13835d6816367bf0a71be3e87910b2de232))
+
+
+### CI/CD
+
+* add changelog generation script ([c8ca195](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/c8ca1954df450e5cc5532ad70950228620a799c0))
+* add full CI/CD pipeline for all platforms ([edd6e35](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/edd6e358176212a0e4fc60839b4b6533410a9bb9))
+* configure release-please and versioning for v1.0.0 ([da46c28](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/da46c2875d3cb43e7d10c9c369f5864397b0f4f1))
+* rewrite pipelines for dotnet, remove C++ engine workflows ([0f97bfb](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/0f97bfb3e0d143fb20e8ed88884e152ccaee67b8))
+* sync dotnet pipelines, configs and scripts from develop ([6c78b92](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/6c78b923f9aeb3815689407a3f401905d3b4455b))
+
 ## [1.1.0](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.0.0...v1.1.0) (2026-07-29)
 
 
