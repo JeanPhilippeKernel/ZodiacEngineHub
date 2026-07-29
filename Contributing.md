@@ -1,22 +1,22 @@
 
-# Contributing to ZEngine
+# Contributing to Panzerfaust
 
 When contributing to this repository, please first discuss the change you wish to make via issue.
 
+## Branch target
+
+**All pull requests must target the `develop` branch.** Direct PRs to `main` are not accepted — `main` is updated only through the release process.
+
 ## Rules
 
-**ZEngine** is built upon 2 rules:
+**Panzerfaust** is built upon 2 rules:
 
-1. You cannot add code that will slow down the rendering process
+1. You cannot add code that will slow down the application startup or engine launch
 2. You cannot add code that will make things complex to use
-
-### Performance
-
-ZEngine is a 3D rendering engine. So every piece of code has to be scrutinized to look for potential bottlenecks or slow downs. Ultimately the goal is to render more with less resources.
 
 ## Commit Message Convention
 
-ZEngine uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Every commit message is linted on pull requests and drives automatic versioning — the type you choose determines how the version number is bumped.
+Panzerfaust uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Every commit message is linted on pull requests and drives automatic versioning — the type you choose determines how the version number is bumped.
 
 ### Format
 
@@ -87,9 +87,13 @@ A CI check (`commitlint`) runs on every pull request and will block the build if
 
 ## Local Setup
 
-Git hooks are installed automatically the first time you run CMake. No manual steps required.
+Run the hook installer once after cloning:
 
-The `pre-push` hook runs clang-format on `ZEngine` and `Tetragrama` before every push, mirroring the CI check. It requires [PowerShell Core (`pwsh`)](https://github.com/PowerShell/PowerShell/releases) and LLVM `clang-format` (version 20–22). If `pwsh` is not found the hook prints a warning and lets the push through; CI will catch formatting issues instead.
+```sh
+sh Scripts/install-hooks.sh
+```
+
+This installs a `commit-msg` hook that validates conventional commits format locally, catching violations before they hit CI.
 
 ## Release Process
 
@@ -119,8 +123,6 @@ Once `develop` is stable enough to ship:
 1. Open a PR from `develop` → `main`
 2. Merge it — Release Please on `main` sees all the accumulated `feat:`/`fix:` commits and opens a stable Release PR
 3. Merge the Release PR → `v0.4.0` stable is tagged and published
-
-The `ZENGINE_VERSION_PRERELEASE` macro in the generated `Core/version.h` will be non-empty on rc builds and empty on stable, so engine code can detect this at compile time.
 
 ## Pull Request Process
 
