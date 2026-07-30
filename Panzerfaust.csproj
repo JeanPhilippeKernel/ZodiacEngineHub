@@ -7,7 +7,7 @@
 		<Nullable>enable</Nullable>
 		<Version>1.2.0</Version>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-		<ApplicationIcon>./Assets/avalonia-logo.ico</ApplicationIcon>
+<ApplicationIcon>./Assets/avalonia-logo.ico</ApplicationIcon>
 		<BaseOutputPath Condition="$([MSBuild]::IsOSPlatform('Windows')) == 'true'">..\Result.Windows.x64.MultiConfig</BaseOutputPath>
 		<BaseOutputPath Condition="$([MSBuild]::IsOSPlatform('OSX')) == 'true' AND $(RuntimeIdentifier) == 'osx-arm64'">..\Result.Darwin.arm64.$(Configuration)</BaseOutputPath>
 		<BaseOutputPath Condition="$([MSBuild]::IsOSPlatform('OSX')) == 'true' AND $(RuntimeIdentifier) == 'osx-x64'">..\Result.Darwin.x64.$(Configuration)</BaseOutputPath>

@@ -88,7 +88,6 @@ A CI check (`commitlint`) runs on every pull request and will block the build if
 For a full guide on setting breakpoints, inspecting values, and using the Avalonia previewer, see [docs/debugging-with-vscode.md](docs/debugging-with-vscode.md).
 
 Run the hook installer once after cloning:
-
 ```sh
 sh Scripts/install-hooks.sh
 ```

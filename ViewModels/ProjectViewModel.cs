@@ -2,10 +2,13 @@
 using Panzerfaust.Service;
 using ReactiveUI;
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Panzerfaust.ViewModels
@@ -19,7 +22,13 @@ namespace Panzerfaust.ViewModels
         private Interaction<EnginePickerViewModel, InstalledEngineViewModel?>? _enginePickerInteraction;
         private System.Collections.ObjectModel.ObservableCollection<InstalledEngineViewModel>? _installedEngines;
 
-        public string Name => _project.Name;
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            private set => this.RaiseAndSetIfChanged(ref _name, value);
+        }
+
         public string Path => _project.Fullpath;
         public string UpdatedDate => _project.UpdateDate.ToShortDateString();
         public string CreatedDate => _project.CreationDate.ToShortDateString();
@@ -34,9 +43,35 @@ namespace Panzerfaust.ViewModels
             }
         }
 
+        private string? _preferredEngineVersion;
+        public string? PreferredEngineVersion
+        {
+            get => _preferredEngineVersion;
+            private set => this.RaiseAndSetIfChanged(ref _preferredEngineVersion, value);
+        }
+
+        private bool _isRenaming;
+        public bool IsRenaming
+        {
+            get => _isRenaming;
+            private set => this.RaiseAndSetIfChanged(ref _isRenaming, value);
+        }
+
+        private string _pendingName = string.Empty;
+        public string PendingName
+        {
+            get => _pendingName;
+            set => this.RaiseAndSetIfChanged(ref _pendingName, value);
+        }
+
         public ReactiveCommand<Unit, Unit> OpenProjectCommand { get; }
         public ReactiveCommand<Unit, Unit> DeleteProjectCommand { get; }
         public ReactiveCommand<Unit, Unit> ShowInfoCommand { get; }
+        public ReactiveCommand<Unit, Unit> ClearPreferredEngineCommand { get; }
+        public ReactiveCommand<Unit, Unit> OpenLocationCommand { get; }
+        public ReactiveCommand<Unit, Unit> BeginRenameCommand { get; }
+        public ReactiveCommand<Unit, Unit> ConfirmRenameCommand { get; }
+        public ReactiveCommand<Unit, Unit> CancelRenameCommand { get; }
 
         public ProjectViewModel(Project p, IProjectService projectService, IEngineService engineService,
             Interaction<string, bool>? deleteInteraction = null,
@@ -49,11 +84,21 @@ namespace Panzerfaust.ViewModels
             _deleteProjectInteraction = deleteInteraction;
             _enginePickerInteraction = enginePickerInteraction;
             _installedEngines = installedEngines;
+            _preferredEngineVersion = p.PreferredEngineVersion;
+            _name = p.Name;
             OpenProjectCommand = ReactiveCommand.CreateFromTask(OnOpenProjectCommand);
             OpenProjectCommand.ThrownExceptions.Subscribe(_ => { });
             DeleteProjectCommand = ReactiveCommand.CreateFromTask(OnDeleteProjectCommand);
             ShowInfoCommand = ReactiveCommand.Create(() =>
                 MessageBus.Current.SendMessage<(string, ProjectViewModel)>((Message.ShowInfoAction, this)));
+            ClearPreferredEngineCommand = ReactiveCommand.CreateFromTask(OnClearPreferredEngine);
+            OpenLocationCommand = ReactiveCommand.Create(OnOpenLocation);
+            BeginRenameCommand = ReactiveCommand.Create(() => { PendingName = _name; IsRenaming = true; });
+            CancelRenameCommand = ReactiveCommand.Create(() => { IsRenaming = false; });
+
+            var canConfirm = this.WhenAnyValue(x => x.PendingName)
+                .Select(n => !string.IsNullOrWhiteSpace(n) && n != _name);
+            ConfirmRenameCommand = ReactiveCommand.CreateFromTask(OnConfirmRename, canConfirm);
         }
 
         public void SetRemovalInteraction(Interaction<string, bool> interaction) => _deleteProjectInteraction = interaction;
@@ -84,9 +129,23 @@ namespace Panzerfaust.ViewModels
             {
                 if (_enginePickerInteraction != null && _installedEngines != null)
                 {
+                    // Use the pinned engine directly if one was saved
+                    var pinned = _installedEngines.FirstOrDefault(e => e.Version == _preferredEngineVersion);
+                    if (pinned != null)
+                    {
+                        await _engineService.StartAsync(_project.Fullpath, pinned.BinaryPath).ConfigureAwait(false);
+                        return;
+                    }
+
                     var pickerVm = new EnginePickerViewModel(_project.Name, _installedEngines);
                     var chosen = await _enginePickerInteraction.Handle(pickerVm).ToTask();
-                    if (chosen == null) return; // user cancelled
+                    if (chosen == null) return;
+
+                    // Persist the choice as the preferred engine for next time
+                    _project.PreferredEngineVersion = chosen.Version;
+                    PreferredEngineVersion = chosen.Version;
+                    await _projectService.SaveAsync(_project).ConfigureAwait(false);
+
                     await _engineService.StartAsync(_project.Fullpath, chosen.BinaryPath).ConfigureAwait(false);
                 }
                 else
@@ -97,6 +156,47 @@ namespace Panzerfaust.ViewModels
             catch (Exception ex)
             {
                 MessageBus.Current.SendMessage<(string, string)>((Message.ToastErrorAction, $"Failed to open project: {ex.Message}"));
+            }
+        }
+
+        private async Task OnConfirmRename()
+        {
+            var trimmed = PendingName.Trim();
+            if (string.IsNullOrEmpty(trimmed)) return;
+            try
+            {
+                await _projectService.RenameAsync(_project, trimmed).ConfigureAwait(false);
+                Name = trimmed;
+                IsRenaming = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBus.Current.SendMessage<(string, string)>((Message.ToastErrorAction, $"Rename failed: {ex.Message}"));
+            }
+        }
+
+        private async Task OnClearPreferredEngine()
+        {
+            _project.PreferredEngineVersion = null;
+            PreferredEngineVersion = null;
+            await _projectService.SaveAsync(_project).ConfigureAwait(false);
+        }
+
+        private void OnOpenLocation()
+        {
+            try
+            {
+                if (!Directory.Exists(_project.Fullpath)) return;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    Process.Start("explorer.exe", $"\"{_project.Fullpath}\"");
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    Process.Start("open", $"\"{_project.Fullpath}\"");
+                else
+                    Process.Start("xdg-open", $"\"{_project.Fullpath}\"");
+            }
+            catch (Exception ex)
+            {
+                MessageBus.Current.SendMessage<(string, string)>((Message.ToastErrorAction, $"Could not open location: {ex.Message}"));
             }
         }
 

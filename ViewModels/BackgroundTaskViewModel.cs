@@ -1,5 +1,6 @@
 using ReactiveUI;
 using System;
+using System.Diagnostics;
 using System.Reactive;
 
 namespace Panzerfaust.ViewModels
@@ -19,6 +20,7 @@ namespace Panzerfaust.ViewModels
                 this.RaisePropertyChanged(nameof(IsSucceeded));
                 this.RaisePropertyChanged(nameof(IsFailed));
                 this.RaisePropertyChanged(nameof(StatusGlyph));
+                this.RaisePropertyChanged(nameof(StatusColor));
             }
         }
 
@@ -36,6 +38,13 @@ namespace Panzerfaust.ViewModels
             set => this.RaiseAndSetIfChanged(ref _errorMessage, value);
         }
 
+        private string _duration = string.Empty;
+        public string Duration
+        {
+            get => _duration;
+            private set => this.RaiseAndSetIfChanged(ref _duration, value);
+        }
+
         public bool IsRunning => _status == BackgroundTaskStatus.Running;
         public bool IsSucceeded => _status == BackgroundTaskStatus.Succeeded;
         public bool IsFailed => _status == BackgroundTaskStatus.Failed;
@@ -46,6 +55,13 @@ namespace Panzerfaust.ViewModels
             BackgroundTaskStatus.Succeeded => "✓",
             BackgroundTaskStatus.Failed => "✕",
             _ => ""
+        };
+
+        public string StatusColor => _status switch
+        {
+            BackgroundTaskStatus.Succeeded => "#3ECF8E",
+            BackgroundTaskStatus.Failed    => "#C42B1C",
+            _                              => "#888888"
         };
 
         public ReactiveCommand<Unit, Unit> RetryCommand { get; }
@@ -65,16 +81,27 @@ namespace Panzerfaust.ViewModels
         {
             Status = BackgroundTaskStatus.Running;
             ErrorMessage = string.Empty;
+            Duration = string.Empty;
+            var sw = Stopwatch.StartNew();
             try
             {
                 await _work();
+                sw.Stop();
+                Duration = FormatDuration(sw.Elapsed);
                 Status = BackgroundTaskStatus.Succeeded;
             }
             catch (Exception ex)
             {
+                sw.Stop();
+                Duration = FormatDuration(sw.Elapsed);
                 ErrorMessage = ex.Message;
                 Status = BackgroundTaskStatus.Failed;
             }
         }
+
+        private static string FormatDuration(TimeSpan t) =>
+            t.TotalSeconds < 1 ? $"{t.Milliseconds}ms"
+            : t.TotalMinutes < 1 ? $"{t.TotalSeconds:F1}s"
+            : $"{(int)t.TotalMinutes}m {t.Seconds}s";
     }
 }

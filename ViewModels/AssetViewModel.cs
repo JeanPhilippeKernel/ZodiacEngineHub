@@ -36,6 +36,16 @@ namespace Panzerfaust.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _isLoadingThumb, value);
         }
 
+        private bool _isDownloaded;
+        public bool IsDownloaded
+        {
+            get => _isDownloaded;
+            private set => this.RaiseAndSetIfChanged(ref _isDownloaded, value);
+        }
+
+        public void RefreshDownloadedState(System.Collections.Generic.HashSet<string> localAssetIds)
+            => IsDownloaded = localAssetIds.Contains(Id);
+
         public ReactiveCommand<Unit, Unit> ShowDetailCommand { get; }
 
         public AssetViewModel(PolyHavenAsset asset, Action<AssetViewModel> onShowDetail)
