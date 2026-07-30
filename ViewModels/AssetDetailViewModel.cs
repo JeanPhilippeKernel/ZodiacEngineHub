@@ -1,5 +1,6 @@
 using ReactiveUI;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -12,6 +13,7 @@ namespace Panzerfaust.ViewModels
         public string Resolution { get; }
         public string Url { get; }
         public string Label => $"{Format.ToUpperInvariant()} · {Resolution}";
+        public List<string> CompanionUrls { get; } = new();
 
         private bool _isSelected;
         public bool IsSelected

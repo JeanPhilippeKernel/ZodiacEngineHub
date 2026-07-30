@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Panzerfaust.ViewModels;assembly=Panzerfaust"
-        mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
+mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
         x:Class="Panzerfaust.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         WindowStartupLocation="CenterScreen"
@@ -12,7 +12,9 @@
         Title="Panzerfaust"
         TransparencyLevelHint="AcrylicBlur"
         Background="Transparent"
-        ExtendClientAreaToDecorationsHint="True">
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="PreferSystemChrome"
+        ExtendClientAreaTitleBarHeightHint="0">
 
   <Window.Styles>
     <Style Selector="Border.navMarker">
@@ -38,6 +40,22 @@
     </Style>
     <Style Selector="ItemsRepeater Button.card:pressed">
       <Setter Property="RenderTransform" Value="scaleX(0.97) scaleY(0.97)"/>
+    </Style>
+    <!-- Hover-reveal: hidden + non-interactive at rest, fade in when card is hovered -->
+    <Style Selector="Button.card Border.hover-reveal">
+      <Setter Property="Opacity" Value="0"/>
+      <Setter Property="IsHitTestVisible" Value="False"/>
+      <Setter Property="Transitions">
+        <Setter.Value>
+          <Transitions>
+            <DoubleTransition Property="Opacity" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+          </Transitions>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style Selector="Button.card:pointerover Border.hover-reveal">
+      <Setter Property="Opacity" Value="1"/>
+      <Setter Property="IsHitTestVisible" Value="True"/>
     </Style>
   </Window.Styles>
 
@@ -66,7 +84,7 @@
           </Transitions>
         </Grid.Transitions>
 
-        <Grid Grid.Row="0" Height="56" ColumnDefinitions="*, Auto" Margin="4,0">
+        <Grid Grid.Row="0" Height="56" ColumnDefinitions="*, Auto" Margin="4,8,4,0">
           <TextBlock Grid.Column="0"
                      Text="Panzerfaust"
                      FontWeight="DemiBold" FontSize="15"
@@ -141,6 +159,25 @@
               <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="8,0,0,0">
                 <PathIcon Data="{StaticResource gamepad_regular}" Width="18" Height="18"/>
                 <TextBlock Text="Samples" VerticalAlignment="Center"
+                           IsVisible="{Binding IsSidebarExpanded}"/>
+              </StackPanel>
+            </Button>
+          </Panel>
+
+          <Panel Margin="0,2">
+            <Border Classes="navMarker" Width="3" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                    Background="#0078D4" CornerRadius="0,2,2,0"
+                    RenderTransformOrigin="0.5,0.5"
+                    RenderTransform="{Binding SelectedPage, Converter={StaticResource StringEqualityConverter}, ConverterParameter=ZodiacEngine}"
+                    Opacity="{Binding SelectedPage, Converter={StaticResource StringEqualityConverter}, ConverterParameter=ZodiacEngine}"/>
+            <Button Command="{Binding NavigateCommand}" CommandParameter="ZodiacEngine"
+                    Background="Transparent" BorderThickness="0"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                    Height="44" CornerRadius="6" Margin="0"
+                    ToolTip.Tip="Zodiac Engine">
+              <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="8,0,0,0">
+                <PathIcon Data="{StaticResource zengine_logo}" Width="18" Height="18"/>
+                <TextBlock Text="Zodiac Engine" VerticalAlignment="Center"
                            IsVisible="{Binding IsSidebarExpanded}"/>
               </StackPanel>
             </Button>
@@ -226,45 +263,128 @@
               </ItemsRepeater.Layout>
               <ItemsRepeater.ItemTemplate>
                 <DataTemplate x:DataType="vm:ProjectViewModel">
-                  <Button Classes="card" Command="{Binding ShowInfoCommand}"
+                  <Button Classes="card" Command="{Binding OpenProjectCommand}"
                           Padding="0" Background="Transparent" BorderThickness="0"
                           HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
                           VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"
-                          CornerRadius="10" Cursor="Hand">
-                    <Border CornerRadius="10" ClipToBounds="True"
+                          CornerRadius="12" Cursor="Hand">
+                    <Border CornerRadius="12" ClipToBounds="True"
                             Background="{DynamicResource ThumbnailPlaceholderBackground}">
                       <Panel>
+
+                        <!-- Thumbnail / placeholder -->
                         <Border Background="{DynamicResource ThumbnailPlaceholderBackground}"
                                 IsVisible="{Binding ThumbnailPath, Converter={StaticResource NullToHidden}}">
-                          <PathIcon Data="{StaticResource folder_regular}" Width="48" Height="48"
-                                    Opacity="0.2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                          <PathIcon Data="{StaticResource zengine_logo}" Width="52" Height="52"
+                                    Opacity="0.12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <Image Source="{Binding ThumbnailPath}" Stretch="UniformToFill"
                                IsVisible="{Binding ThumbnailPath, Converter={StaticResource NullToVisible}}"/>
-                        <Border VerticalAlignment="Bottom" Background="{DynamicResource CardOverlayBackground}" Padding="12,10">
-                          <Grid RowDefinitions="Auto, Auto, Auto">
-                            <TextBlock Grid.Row="0" Text="{Binding Name}" FontSize="14" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource CardOverlayForeground}" TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Grid.Row="1" Text="{Binding UpdatedDate}" FontSize="11"
-                                       Foreground="{DynamicResource CardOverlayForeground}" Opacity="0.6" Margin="0,2,0,8"/>
-                            <Grid ColumnDefinitions="*, Auto" Grid.Row="2">
-                              <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
-                                <Button Content="Open" CornerRadius="4" FontSize="12" Padding="10,4"
-                                        Background="#44FFFFFF" Foreground="White"
-                                        Command="{Binding OpenProjectCommand}"/>
-                                <Button ToolTip.Tip="Info" CornerRadius="4" Padding="6,4"
-                                        Background="#44FFFFFF" Foreground="White"
-                                        Command="{Binding ShowInfoCommand}">
-                                  <PathIcon Data="{StaticResource info_regular}" Width="12" Height="12" Foreground="White"/>
-                                </Button>
-                              </StackPanel>
-                              <Button Grid.Column="1" ToolTip.Tip="Delete" Background="#C42B1C" CornerRadius="4" Padding="6,4"
-                                      Command="{Binding DeleteProjectCommand}">
-                                <PathIcon Data="{StaticResource delete_regular}" Width="12" Height="12" Foreground="White"/>
-                              </Button>
-                            </Grid>
+
+                        <!-- Gradient fade from transparent to dark (bottom ~55%) -->
+                        <Border VerticalAlignment="Bottom" Height="160">
+                          <Border.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                              <GradientStop Color="#00000000" Offset="0"/>
+                              <GradientStop Color="#88000000" Offset="0.65"/>
+                              <GradientStop Color="#BB000000" Offset="1"/>
+                            </LinearGradientBrush>
+                          </Border.Background>
+                        </Border>
+
+                        <!-- Engine badge (always visible when pinned) -->
+                        <Border HorizontalAlignment="Left" VerticalAlignment="Top"
+                                Margin="10,10,0,0"
+                                Background="#CC0078D4" CornerRadius="6" Padding="7,3"
+                                IsVisible="{Binding PreferredEngineVersion, Converter={x:Static StringConverters.IsNotNullOrEmpty}, FallbackValue=False}">
+                          <Grid ColumnDefinitions="*, Auto">
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding PreferredEngineVersion, FallbackValue=''}"
+                                       FontSize="10" FontWeight="SemiBold" Foreground="White"
+                                       VerticalAlignment="Center"/>
+                            <Button Grid.Column="1"
+                                    ToolTip.Tip="Clear pinned engine"
+                                    Background="Transparent" BorderThickness="0"
+                                    Padding="4,0" Margin="4,0,0,0"
+                                    Command="{Binding ClearPreferredEngineCommand}">
+                              <PathIcon Data="{StaticResource dismiss_regular}" Width="8" Height="8" Foreground="White"/>
+                            </Button>
                           </Grid>
                         </Border>
+
+                        <!-- Hover-reveal: action row top-right -->
+                        <Border Classes="hover-reveal"
+                                HorizontalAlignment="Right" VerticalAlignment="Top"
+                                Margin="0,10,10,0"
+                                Background="{DynamicResource CardHoverActionBackground}" CornerRadius="8" Padding="4,3">
+                          <StackPanel Orientation="Horizontal" Spacing="2">
+                            <Button ToolTip.Tip="Show in folder"
+                                    Background="Transparent" BorderThickness="0"
+                                    Padding="5,4" CornerRadius="6"
+                                    Command="{Binding OpenLocationCommand}">
+                              <PathIcon Data="{StaticResource folder_open_regular}" Width="12" Height="12" Foreground="White"/>
+                            </Button>
+                            <Button ToolTip.Tip="Info"
+                                    Background="Transparent" BorderThickness="0"
+                                    Padding="5,4" CornerRadius="6"
+                                    Command="{Binding ShowInfoCommand}">
+                              <PathIcon Data="{StaticResource info_regular}" Width="12" Height="12" Foreground="White"/>
+                            </Button>
+                            <Button ToolTip.Tip="Delete"
+                                    Background="Transparent" BorderThickness="0"
+                                    Padding="5,4" CornerRadius="6"
+                                    Command="{Binding DeleteProjectCommand}">
+                              <PathIcon Data="{StaticResource delete_regular}" Width="12" Height="12" Foreground="#FF6B6B"/>
+                            </Button>
+                          </StackPanel>
+                        </Border>
+
+                        <!-- Bottom info: always-visible name/date, hover-reveal rename pencil -->
+                        <StackPanel VerticalAlignment="Bottom" Margin="14,0,14,14" Spacing="4">
+
+                          <!-- Rename mode -->
+                          <Grid ColumnDefinitions="*, Auto, Auto"
+                                IsVisible="{Binding IsRenaming}">
+                            <TextBox Grid.Column="0"
+                                     Text="{Binding PendingName, Mode=TwoWay}"
+                                     FontSize="13" FontWeight="SemiBold"
+                                     Padding="6,4" CornerRadius="6"
+                                     VerticalAlignment="Center"/>
+                            <Button Grid.Column="1" ToolTip.Tip="Confirm"
+                                    Background="{DynamicResource CardRenameConfirmBackground}" BorderThickness="0"
+                                    Padding="6,4" Margin="4,0,0,0" CornerRadius="6"
+                                    Command="{Binding ConfirmRenameCommand}">
+                              <PathIcon Data="{StaticResource checkmark_regular}" Width="11" Height="11" Foreground="White"/>
+                            </Button>
+                            <Button Grid.Column="2" ToolTip.Tip="Cancel"
+                                    Background="{DynamicResource CardRenameCancelBackground}" BorderThickness="0"
+                                    Padding="6,4" Margin="4,0,0,0" CornerRadius="6"
+                                    Command="{Binding CancelRenameCommand}">
+                              <PathIcon Data="{StaticResource dismiss_regular}" Width="11" Height="11" Foreground="White"/>
+                            </Button>
+                          </Grid>
+
+                          <!-- Normal mode: name row + date -->
+                          <Grid ColumnDefinitions="*, Auto" IsVisible="{Binding !IsRenaming}">
+                            <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                       FontSize="14" FontWeight="SemiBold"
+                                       Foreground="White" TextTrimming="CharacterEllipsis"
+                                       VerticalAlignment="Center"/>
+                            <!-- Hover-reveal rename pencil -->
+                            <Border Grid.Column="1" Classes="hover-reveal">
+                              <Button ToolTip.Tip="Rename"
+                                      Background="Transparent" BorderThickness="0"
+                                      Padding="5,4" CornerRadius="6"
+                                      Command="{Binding BeginRenameCommand}">
+                                <PathIcon Data="{StaticResource edit_regular}" Width="11" Height="11" Foreground="White" Opacity="0.7"/>
+                              </Button>
+                            </Border>
+                          </Grid>
+                          <TextBlock Text="{Binding UpdatedDate}"
+                                     FontSize="11" Foreground="White" Opacity="0.5"/>
+
+                        </StackPanel>
+
                       </Panel>
                     </Border>
                   </Button>
@@ -292,77 +412,157 @@
                      Margin="0,0,10,0" CornerRadius="6"/>
           </Grid>
 
+          <!-- Body: card grid (left) + right panel (detail + 3D preview) -->
           <Grid Grid.Row="1" ColumnDefinitions="*, Auto">
 
+            <!-- ── Left: scrollable two-section card grid ── -->
             <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
               <StackPanel Spacing="0">
 
-                <!-- ── Group 1: Local (offline) assets ── -->
-                <StackPanel Margin="24,0,24,24" Spacing="12">
+                <!-- Section 1: Local Assets -->
+                <StackPanel Margin="24,8,24,24" Spacing="12">
                   <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,4,0,0">
                     <TextBlock Text="Local Assets" FontSize="16" FontWeight="SemiBold"/>
-                    <TextBlock Text="Downloaded &amp; available offline" FontSize="11" Opacity="0.45" VerticalAlignment="Center" Margin="0,3,0,0"/>
+                    <TextBlock Text="Downloaded &amp; available offline" FontSize="11" Opacity="0.45"
+                               VerticalAlignment="Center" Margin="0,3,0,0"/>
                   </StackPanel>
 
                   <TextBlock Text="No local assets yet. Download some from Poly Haven below."
                              FontSize="12" Opacity="0.45"
                              IsVisible="{Binding !HasLocalAssets}"/>
 
-                  <ItemsControl ItemsSource="{Binding LocalAssets}"
-                                IsVisible="{Binding HasLocalAssets}">
-                    <ItemsControl.ItemTemplate>
-                      <DataTemplate x:DataType="vm:LocalAssetViewModel">
-                        <Border Background="{DynamicResource SettingsGroupBackground}"
-                                CornerRadius="8" Padding="12,10" Margin="0,0,0,6">
-                          <Grid ColumnDefinitions="*, Auto, Auto, Auto">
-                            <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
-                              <TextBlock Text="{Binding Label}" FontSize="13" FontWeight="SemiBold"
-                                         TextTrimming="CharacterEllipsis"/>
-                              <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="{Binding FileName}" FontSize="11" Opacity="0.5"
-                                           TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Text="{Binding SizeLabel}" FontSize="11" Opacity="0.4"/>
-                              </StackPanel>
-                            </StackPanel>
-                            <Border Grid.Column="1" Background="#1E7E34" CornerRadius="4"
-                                    Padding="6,2" VerticalAlignment="Center" Margin="8,0">
-                              <TextBlock Text="Local" FontSize="10" Foreground="White" FontWeight="SemiBold"/>
+                  <ItemsRepeater ItemsSource="{Binding LocalAssetGroups}"
+                                 IsVisible="{Binding HasLocalAssets}">
+                    <ItemsRepeater.Layout>
+                      <UniformGridLayout MinItemWidth="180"
+                                         ItemsStretch="Fill"
+                                         MinColumnSpacing="14" MinRowSpacing="14"/>
+                    </ItemsRepeater.Layout>
+                    <ItemsRepeater.ItemTemplate>
+                      <DataTemplate x:DataType="vm:LocalAssetGroupViewModel">
+                        <!-- Fixed-height card: thumbnail (top) + bottom strip (name + expand toggle) -->
+                        <Grid RowDefinitions="165, Auto">
+
+                          <!-- Row 0: thumbnail -->
+                          <Button Grid.Row="0"
+                                  Classes="card"
+                                  Command="{Binding OpenDetailCommand}"
+                                  Padding="0" Background="Transparent" BorderThickness="0"
+                                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                                  VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                  CornerRadius="10,10,0,0" Cursor="Hand">
+                            <Border CornerRadius="10,10,0,0" ClipToBounds="True"
+                                    Background="{DynamicResource ThumbnailPlaceholderBackground}">
+                              <Panel>
+                                <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"
+                                       IsVisible="{Binding Thumbnail, Converter={StaticResource NullToVisible}}"/>
+                                <Border Background="{DynamicResource ThumbnailPlaceholderBackground}"
+                                        IsVisible="{Binding Thumbnail, Converter={StaticResource NullToHidden}}">
+                                  <TextBlock Text="{Binding AssetInitial}"
+                                             FontSize="36" FontWeight="SemiBold" Opacity="0.15"
+                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <Border HorizontalAlignment="Left" VerticalAlignment="Top"
+                                        Background="#1E7E34" CornerRadius="0,0,6,0" Padding="6,3">
+                                  <TextBlock Text="Local" FontSize="9" Foreground="White" FontWeight="SemiBold"/>
+                                </Border>
+                              </Panel>
                             </Border>
-                            <Button Grid.Column="2"
-                                    Content="{Binding ShowInFilesLabel}"
-                                    Command="{Binding ShowInFinderCommand}"
-                                    Background="Transparent"
-                                    BorderBrush="{DynamicResource ContentForeground}"
-                                    BorderThickness="1"
-                                    CornerRadius="5"
-                                    Padding="8,4"
-                                    FontSize="11"
-                                    VerticalAlignment="Center"
-                                    Margin="0,0,6,0"/>
-                            <Button Grid.Column="3"
-                                    Command="{Binding DeleteCommand}"
-                                    Background="#C42B1C"
-                                    BorderThickness="0"
-                                    CornerRadius="5"
-                                    Padding="8,4"
-                                    VerticalAlignment="Center"
-                                    ToolTip.Tip="Delete">
-                              <PathIcon Data="{StaticResource delete_regular}" Width="12" Height="12" Foreground="White"/>
-                            </Button>
-                          </Grid>
-                        </Border>
+                          </Button>
+
+                          <!-- Row 1: bottom strip -->
+                          <Border Grid.Row="1"
+                                  Background="{DynamicResource CardOverlayBackground}"
+                                  CornerRadius="0,0,10,10">
+                            <Grid ColumnDefinitions="*, Auto">
+                              <Button Grid.Column="0"
+                                      Command="{Binding OpenDetailCommand}"
+                                      Background="Transparent" BorderThickness="0"
+                                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                      VerticalAlignment="Stretch"
+                                      CornerRadius="0,0,0,10" Padding="10,8" Cursor="Hand">
+                                <StackPanel Spacing="2">
+                                  <TextBlock Text="{Binding AssetId}" FontSize="13" FontWeight="SemiBold"
+                                             Foreground="{DynamicResource CardOverlayForeground}"
+                                             TextTrimming="CharacterEllipsis"/>
+                                  <TextBlock Text="{Binding PrimaryLabel}" FontSize="11"
+                                             Foreground="{DynamicResource CardOverlayForeground}" Opacity="0.6"/>
+                                </StackPanel>
+                              </Button>
+                              <Button Grid.Column="1"
+                                      Background="#CC0078D4" BorderThickness="0"
+                                      CornerRadius="20" Padding="10,6" Margin="4,0,8,0"
+                                      VerticalAlignment="Center"
+                                      Command="{Binding ToggleExpandCommand}"
+                                      ToolTip.Tip="Show versions">
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                  <TextBlock Text="{Binding VersionLabel}" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                                  <PathIcon Width="10" Height="10" Foreground="White"
+                                            Data="{StaticResource chevron_down_regular}"
+                                            IsVisible="{Binding !IsExpanded}"/>
+                                  <PathIcon Width="10" Height="10" Foreground="White"
+                                            Data="{StaticResource chevron_up_regular}"
+                                            IsVisible="{Binding IsExpanded}"/>
+                                </StackPanel>
+                              </Button>
+                            </Grid>
+                          </Border>
+
+                        </Grid>
                       </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                  </ItemsControl>
+                    </ItemsRepeater.ItemTemplate>
+                  </ItemsRepeater>
+
+                  <!-- Expanded versions panel — lives outside the grid so it never affects card heights -->
+                  <Border IsVisible="{Binding HasExpandedGroup}"
+                          Background="{DynamicResource ExpandedPanelBackground}"
+                          CornerRadius="8" Padding="0,4,0,4"
+                          Margin="0,4,0,0">
+                    <ItemsRepeater ItemsSource="{Binding ExpandedGroup.Versions}">
+                      <ItemsRepeater.ItemTemplate>
+                        <DataTemplate x:DataType="vm:LocalAssetViewModel">
+                          <Border Padding="10,6">
+                            <Grid ColumnDefinitions="*, Auto">
+                              <Button Grid.Column="0"
+                                      Background="Transparent" BorderThickness="0"
+                                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                      Padding="0" Command="{Binding OpenDetailCommand}" Cursor="Hand">
+                                <StackPanel Spacing="1">
+                                  <TextBlock Text="{Binding Resolution}" FontSize="12" FontWeight="SemiBold"/>
+                                  <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="{Binding Format}" FontSize="11" Opacity="0.55"/>
+                                    <TextBlock Text="{Binding SizeLabel}" FontSize="11" Opacity="0.45"/>
+                                  </StackPanel>
+                                </StackPanel>
+                              </Button>
+                              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                                <Button Command="{Binding ShowInFinderCommand}"
+                                        Background="Transparent" BorderThickness="0"
+                                        Padding="4" ToolTip.Tip="{Binding ShowInFilesLabel}">
+                                  <PathIcon Data="{StaticResource folder_regular}" Width="11" Height="11"/>
+                                </Button>
+                                <Button Command="{Binding DeleteCommand}"
+                                        Background="Transparent" BorderThickness="0"
+                                        Padding="4" ToolTip.Tip="Delete">
+                                  <PathIcon Data="{StaticResource delete_regular}" Width="11" Height="11" Foreground="#FF6B6B"/>
+                                </Button>
+                              </StackPanel>
+                            </Grid>
+                          </Border>
+                        </DataTemplate>
+                      </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                  </Border>
                 </StackPanel>
 
                 <Rectangle Height="1" Fill="{DynamicResource SettingsGroupBackground}" Margin="24,0,24,20"/>
 
-                <!-- ── Group 2: Poly Haven (downloadable) ── -->
+                <!-- Section 2: Poly Haven -->
                 <StackPanel Margin="24,0,24,24" Spacing="12">
                   <StackPanel Orientation="Horizontal" Spacing="10">
                     <TextBlock Text="Poly Haven" FontSize="16" FontWeight="SemiBold"/>
-                    <TextBlock Text="CC0 · free to use" FontSize="11" Opacity="0.45" VerticalAlignment="Center" Margin="0,3,0,0"/>
+                    <TextBlock Text="CC0 · free to use" FontSize="11" Opacity="0.45"
+                               VerticalAlignment="Center" Margin="0,3,0,0"/>
                   </StackPanel>
 
                   <TextBlock Text="Loading assets…" FontSize="13" Opacity="0.5"
@@ -374,7 +574,7 @@
                   <ItemsRepeater ItemsSource="{Binding FilteredAssets}"
                                  IsVisible="{Binding !IsLoadingAssets}">
                     <ItemsRepeater.Layout>
-                      <UniformGridLayout MinItemWidth="200" MinItemHeight="230"
+                      <UniformGridLayout MinItemWidth="180" MinItemHeight="210"
                                          ItemsStretch="Fill"
                                          MinColumnSpacing="14" MinRowSpacing="14"/>
                     </ItemsRepeater.Layout>
@@ -400,10 +600,17 @@
                                       Padding="10,8">
                                 <StackPanel Spacing="2">
                                   <TextBlock Text="{Binding Name}" FontSize="13" FontWeight="SemiBold"
-                                             Foreground="{DynamicResource CardOverlayForeground}" TextTrimming="CharacterEllipsis"/>
+                                             Foreground="{DynamicResource CardOverlayForeground}"
+                                             TextTrimming="CharacterEllipsis"/>
                                   <TextBlock Text="{Binding PolyCountLabel}" FontSize="11"
                                              Foreground="{DynamicResource CardOverlayForeground}" Opacity="0.6"/>
                                 </StackPanel>
+                              </Border>
+                              <!-- Local badge when already downloaded -->
+                              <Border HorizontalAlignment="Left" VerticalAlignment="Top"
+                                      Background="#1E7E34" CornerRadius="0,0,6,0" Padding="6,3"
+                                      IsVisible="{Binding IsDownloaded}">
+                                <TextBlock Text="Local" FontSize="9" Foreground="White" FontWeight="SemiBold"/>
                               </Border>
                             </Panel>
                           </Border>
@@ -416,71 +623,151 @@
               </StackPanel>
             </ScrollViewer>
 
+            <!-- ── Right panel: switches between remote and local asset detail ── -->
             <Border Grid.Column="1"
-                    Width="{Binding IsAssetDetailOpen, Converter={StaticResource BoolToInfoPanelWidth}}"
+                    Width="280"
+                    IsVisible="{Binding IsRightPanelOpen}"
+                    VerticalAlignment="Stretch"
                     Background="{DynamicResource SidebarBackground}"
                     BorderBrush="{DynamicResource SettingsGroupBackground}"
                     BorderThickness="1,0,0,0">
-              <Border.Transitions>
-                <Transitions>
-                  <DoubleTransition Property="Width" Duration="0:0:0.2" Easing="CubicEaseInOut"/>
-                </Transitions>
-              </Border.Transitions>
-              <ScrollViewer VerticalScrollBarVisibility="Auto"
-                            IsVisible="{Binding IsAssetDetailOpen}">
-                <StackPanel Margin="16,16,16,24" Spacing="16"
-                            DataContext="{Binding SelectedAssetDetail}">
+              <Panel>
 
-                  <Grid ColumnDefinitions="*, Auto">
-                    <TextBlock Grid.Column="0" Text="{Binding Asset.Name}"
-                               FontSize="16" FontWeight="SemiBold"
-                               TextWrapping="Wrap" VerticalAlignment="Center"/>
-                    <Button Grid.Column="1" Background="Transparent" BorderThickness="0"
-                            Padding="6" VerticalAlignment="Top"
-                            Command="{Binding CloseCommand}">
-                      <PathIcon Data="{StaticResource dismiss_regular}" Width="12" Height="12"/>
-                    </Button>
-                  </Grid>
+                <!-- Remote (Poly Haven) asset detail -->
+                <ScrollViewer IsVisible="{Binding IsAssetDetailOpen}"
+                              VerticalScrollBarVisibility="Auto">
+                  <StackPanel Margin="16,16,16,16" Spacing="12"
+                              DataContext="{Binding SelectedAssetDetail}">
 
-                  <Border CornerRadius="8" ClipToBounds="True" Height="160"
-                          Background="{DynamicResource ThumbnailPlaceholderBackground}">
-                    <Image Source="{Binding Asset.Thumbnail}" Stretch="UniformToFill"/>
-                  </Border>
+                    <Grid ColumnDefinitions="*, Auto">
+                      <TextBlock Grid.Column="0" Text="{Binding Asset.Name}"
+                                 FontSize="15" FontWeight="SemiBold"
+                                 TextWrapping="Wrap" VerticalAlignment="Center"/>
+                      <Button Grid.Column="1" Background="Transparent" BorderThickness="0"
+                              Padding="6" VerticalAlignment="Top"
+                              Command="{Binding CloseCommand}">
+                        <PathIcon Data="{StaticResource dismiss_regular}" Width="12" Height="12"/>
+                      </Button>
+                    </Grid>
 
-                  <StackPanel Spacing="4">
-                    <TextBlock Text="{Binding Asset.PolyCountLabel}" FontSize="12" Opacity="0.6"/>
-                    <TextBlock Text="{Binding Asset.Categories}" FontSize="12" Opacity="0.5"
-                               TextTrimming="CharacterEllipsis"/>
+                    <Border CornerRadius="8" ClipToBounds="True" Height="180"
+                            Background="{DynamicResource ThumbnailPlaceholderBackground}">
+                      <Image Source="{Binding Asset.Thumbnail}" Stretch="UniformToFill"/>
+                    </Border>
+
+                    <StackPanel Spacing="4">
+                      <TextBlock Text="{Binding Asset.PolyCountLabel}" FontSize="12" Opacity="0.6"/>
+                      <TextBlock Text="{Binding Asset.Categories}" FontSize="11" Opacity="0.45"
+                                 TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <Rectangle Height="1" Fill="{DynamicResource SettingsGroupBackground}"/>
+
+                    <StackPanel Spacing="6">
+                      <TextBlock Text="Format &amp; Resolution" FontSize="11"
+                                 FontWeight="SemiBold" Opacity="0.55"/>
+                      <TextBlock Text="Loading formats…" FontSize="12" Opacity="0.45"
+                                 IsVisible="{Binding IsLoadingFormats}"/>
+                      <ComboBox ItemsSource="{Binding FormatOptions}"
+                                SelectedItem="{Binding SelectedFormat}"
+                                HorizontalAlignment="Stretch"
+                                IsVisible="{Binding !IsLoadingFormats}">
+                        <ComboBox.ItemTemplate>
+                          <DataTemplate x:DataType="vm:AssetFormatOption">
+                            <TextBlock Text="{Binding Label}" FontSize="12"/>
+                          </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                      </ComboBox>
+                    </StackPanel>
+
+                    <Button Content="↓ Download"
+                            Command="{Binding DownloadCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Background="#0078D4" Foreground="White"
+                            CornerRadius="6" Padding="0,10"/>
+
                   </StackPanel>
+                </ScrollViewer>
 
-                  <Rectangle Height="1" Fill="{DynamicResource SettingsGroupBackground}"/>
+                <!-- Local asset detail -->
+                <ScrollViewer IsVisible="{Binding IsLocalAssetDetailOpen}"
+                              VerticalScrollBarVisibility="Auto">
+                  <StackPanel Margin="16,16,16,16" Spacing="12"
+                              DataContext="{Binding SelectedLocalAssetDetail}">
 
-                  <StackPanel Spacing="8">
-                    <TextBlock Text="Format &amp; Resolution" FontSize="12" FontWeight="SemiBold" Opacity="0.6"/>
-                    <TextBlock Text="Loading formats…" FontSize="12" Opacity="0.45"
-                               IsVisible="{Binding IsLoadingFormats}"/>
-                    <ListBox ItemsSource="{Binding FormatOptions}"
-                             SelectedItem="{Binding SelectedFormat}"
-                             Background="Transparent" BorderThickness="0"
-                             MaxHeight="200"
-                             IsVisible="{Binding !IsLoadingFormats}">
-                      <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:AssetFormatOption">
-                          <TextBlock Text="{Binding Label}" FontSize="12" Padding="2"/>
-                        </DataTemplate>
-                      </ListBox.ItemTemplate>
-                    </ListBox>
+                    <Grid ColumnDefinitions="*, Auto">
+                      <TextBlock Grid.Column="0" Text="{Binding AssetId}"
+                                 FontSize="15" FontWeight="SemiBold"
+                                 TextWrapping="Wrap" VerticalAlignment="Center"/>
+                      <Button Grid.Column="1" Background="Transparent" BorderThickness="0"
+                              Padding="6" VerticalAlignment="Top"
+                              Command="{Binding CloseCommand}">
+                        <PathIcon Data="{StaticResource dismiss_regular}" Width="12" Height="12"/>
+                      </Button>
+                    </Grid>
+
+                    <!-- Thumbnail (diffuse texture) -->
+                    <Border CornerRadius="8" ClipToBounds="True" Height="180"
+                            Background="{DynamicResource ThumbnailPlaceholderBackground}">
+                      <Panel>
+                        <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"
+                               IsVisible="{Binding Thumbnail, Converter={StaticResource NullToVisible}}"/>
+                        <TextBlock Text="{Binding AssetId[0]}"
+                                   FontSize="48" FontWeight="SemiBold" Opacity="0.12"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   IsVisible="{Binding Thumbnail, Converter={StaticResource NullToHidden}}"/>
+                      </Panel>
+                    </Border>
+
+                    <!-- File info -->
+                    <StackPanel Spacing="4">
+                      <TextBlock Text="{Binding FileName}" FontSize="12" Opacity="0.7"
+                                 TextTrimming="CharacterEllipsis"/>
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding Resolution}" FontSize="11" Opacity="0.5"/>
+                        <TextBlock Text="{Binding Format, StringFormat='· {0}'}" FontSize="11" Opacity="0.5"/>
+                        <TextBlock Text="{Binding SizeLabel, StringFormat='· {0}'}" FontSize="11" Opacity="0.5"/>
+                      </StackPanel>
+                    </StackPanel>
+
+                    <Rectangle Height="1" Fill="{DynamicResource SettingsGroupBackground}"/>
+
+                    <!-- Mesh stats -->
+                    <StackPanel Spacing="6">
+                      <TextBlock Text="Mesh Statistics" FontSize="11"
+                                 FontWeight="SemiBold" Opacity="0.55"/>
+                      <TextBlock Text="Analysing…" FontSize="11" Opacity="0.4"
+                                 IsVisible="{Binding IsLoadingStats}"/>
+                      <Grid IsVisible="{Binding !IsLoadingStats}"
+                            ColumnDefinitions="*, Auto" RowDefinitions="Auto,Auto,Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Vertices" FontSize="12" Opacity="0.6"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1"
+                                   Text="{Binding VertexCount, StringFormat='{}{0:N0}'}"
+                                   FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Indices" FontSize="12" Opacity="0.6"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1"
+                                   Text="{Binding IndexCount, StringFormat='{}{0:N0}'}"
+                                   FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Triangles" FontSize="12" Opacity="0.6"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1"
+                                   Text="{Binding TriangleCount, StringFormat='{}{0:N0}'}"
+                                   FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                      </Grid>
+                    </StackPanel>
+
+                    <Rectangle Height="1" Fill="{DynamicResource SettingsGroupBackground}"/>
+
+                    <Button Content="Show in Finder"
+                            Command="{Binding ShowInFinderCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            CornerRadius="6" Padding="0,8"/>
+
                   </StackPanel>
+                </ScrollViewer>
 
-                  <Button Content="↓ Download"
-                          Command="{Binding DownloadCommand}"
-                          HorizontalAlignment="Stretch"
-                          HorizontalContentAlignment="Center"
-                          Background="#0078D4" Foreground="White"
-                          CornerRadius="6" Padding="0,10"/>
-
-                </StackPanel>
-              </ScrollViewer>
+              </Panel>
             </Border>
 
           </Grid>
@@ -492,6 +779,164 @@
           <Grid.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.18" Easing="CubicEaseInOut"/></Transitions></Grid.Transitions>
           <TextBlock Text="Samples" Margin="30,30,0,0" FontSize="25" FontWeight="SemiBold" VerticalAlignment="Top"/>
         </Grid>
+
+        <!-- Zodiac Engine -->
+        <ScrollViewer Opacity="{Binding SelectedPage, Converter={StaticResource StringEqualityConverter}, ConverterParameter=ZodiacEngine}"
+                      IsHitTestVisible="{Binding SelectedPage, Converter={StaticResource StringEqualityConverter}, ConverterParameter=ZodiacEngine}"
+                      VerticalScrollBarVisibility="Auto">
+          <ScrollViewer.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.18" Easing="CubicEaseInOut"/></Transitions></ScrollViewer.Transitions>
+          <StackPanel Margin="30,30,30,30" Spacing="24">
+            <TextBlock Text="Zodiac Engine" FontSize="25" FontWeight="SemiBold"/>
+
+            <Border Background="{DynamicResource SettingsGroupBackground}" CornerRadius="8" Padding="20,16">
+              <StackPanel Spacing="14">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="Installation location" FontSize="14" FontWeight="SemiBold" Opacity="0.6"/>
+                  <TextBlock Text="Where the engine binaries will be installed." FontSize="11" Opacity="0.5"/>
+                </StackPanel>
+                <Grid ColumnDefinitions="*, Auto">
+                  <TextBox Grid.Column="0"
+                           Text="{Binding EngineInstallLocation, Mode=TwoWay}"
+                           IsReadOnly="True"
+                           CornerRadius="6,0,0,6"
+                           VerticalAlignment="Center"/>
+                  <Button Grid.Column="1"
+                          Content="..."
+                          CornerRadius="0,6,6,0"
+                          Padding="14,0"
+                          Height="32"
+                          VerticalAlignment="Center"
+                          Command="{Binding BrowseEngineInstallLocationCommand}"/>
+                </Grid>
+              </StackPanel>
+            </Border>
+
+            <Border Background="{DynamicResource SettingsGroupBackground}" CornerRadius="8" Padding="20,16"
+                    IsVisible="{Binding IsDebugBuild}">
+              <StackPanel Spacing="14">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="Additional search path" FontSize="14" FontWeight="SemiBold" Opacity="0.6"/>
+                  <TextBlock Text="Debug only — extra location for the engine lookup (local dev builds)." FontSize="11" Opacity="0.5" Foreground="#E8A829"/>
+                </StackPanel>
+                <Grid ColumnDefinitions="*, Auto">
+                  <TextBox Grid.Column="0"
+                           Text="{Binding AdditionalEngineSearchPath, Mode=TwoWay}"
+                           Watermark="Leave empty to skip"
+                           IsReadOnly="True"
+                           CornerRadius="6,0,0,6"
+                           VerticalAlignment="Center"/>
+                  <Button Grid.Column="1"
+                          Content="..."
+                          CornerRadius="0,6,6,0"
+                          Padding="14,0"
+                          Height="32"
+                          VerticalAlignment="Center"
+                          Command="{Binding BrowseAdditionalEnginePathCommand}"/>
+                </Grid>
+              </StackPanel>
+            </Border>
+
+            <Border Background="{DynamicResource SettingsGroupBackground}" CornerRadius="8" Padding="20,16">
+              <StackPanel Spacing="14">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="Installed" FontSize="14" FontWeight="SemiBold" Opacity="0.6"/>
+                  <TextBlock Text="Engine versions currently installed on this machine." FontSize="11" Opacity="0.5"/>
+                </StackPanel>
+                <TextBlock Text="No engines installed yet."
+                           FontSize="12" Opacity="0.45" FontStyle="Italic"
+                           IsVisible="{Binding !HasInstalledEngines}"/>
+                <ItemsControl ItemsSource="{Binding InstalledEngines}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:InstalledEngineViewModel">
+                      <Border Background="{DynamicResource CardBackground}" CornerRadius="6"
+                              Padding="12,8" Margin="0,0,0,4">
+                        <Grid ColumnDefinitions="*, Auto">
+                          <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Version}" FontSize="13" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding InstallPath}" FontSize="11" Opacity="0.45"
+                                       TextTrimming="CharacterEllipsis"/>
+                          </StackPanel>
+                          <Button Grid.Column="1"
+                                  Content="Uninstall"
+                                  Command="{Binding UninstallCommand}"
+                                  IsVisible="{Binding CanUninstall}"
+                                  FontSize="11" Padding="10,4" CornerRadius="4"
+                                  Background="#C42B1C" Foreground="White"
+                                  VerticalAlignment="Center"/>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+
+            <Border Background="{DynamicResource SettingsGroupBackground}" CornerRadius="8" Padding="20,16">
+              <StackPanel Spacing="14">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="Available releases" FontSize="14" FontWeight="SemiBold" Opacity="0.6"/>
+                  <TextBlock Text="Select which engine version to download and use." FontSize="11" Opacity="0.5"/>
+                </StackPanel>
+
+                <TextBlock Text="Loading releases…"
+                           FontSize="12" Opacity="0.55" TextAlignment="Center"
+                           IsVisible="{Binding IsLoadingReleases}"/>
+
+                <TextBlock Text="{Binding ReleasesError}"
+                           FontSize="12" Foreground="#C42B1C"
+                           TextWrapping="Wrap"
+                           IsVisible="{Binding ReleasesError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+                <ListBox ItemsSource="{Binding Releases}"
+                         SelectedItem="{Binding SelectedRelease}"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         MaxHeight="320"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ReleaseViewModel">
+                      <Grid ColumnDefinitions="*, Auto, Auto" Margin="0,2">
+                        <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                          <TextBlock Text="{Binding DisplayName}" FontSize="13" FontWeight="Medium"/>
+                          <TextBlock Text="{Binding PublishedDate}" FontSize="11" Opacity="0.5"/>
+                        </StackPanel>
+                        <Border Grid.Column="1"
+                                CornerRadius="4"
+                                Padding="6,2"
+                                Margin="0,0,8,0"
+                                VerticalAlignment="Center"
+                                Background="{Binding BadgeColor}">
+                          <TextBlock Text="{Binding Badge}" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                        </Border>
+                        <Button Grid.Column="2"
+                                Content="{Binding DownloadLabel}"
+                                Command="{Binding DownloadCommand}"
+                                IsVisible="{Binding HasDownload}"
+                                FontSize="11" Padding="10,4" CornerRadius="4"
+                                Background="#0078D4" Foreground="White"
+                                VerticalAlignment="Center"/>
+                      </Grid>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Spacing="4"
+                            IsVisible="{Binding SelectedRelease, Converter={x:Static ObjectConverters.IsNotNull}}">
+                  <TextBlock Text="Selected:" FontSize="11" Opacity="0.5"/>
+                  <TextBlock Text="{Binding SelectedRelease.DisplayName, FallbackValue=''}" FontSize="13" FontWeight="SemiBold"/>
+                  <TextBlock Text="{Binding SelectedRelease.PlatformDownloadUrl, FallbackValue=''}"
+                             FontSize="11" Opacity="0.5"
+                             TextWrapping="Wrap"
+                             IsVisible="{Binding SelectedRelease.PlatformDownloadUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}, FallbackValue=False}"/>
+                  <TextBlock Text="No asset available for this platform."
+                             FontSize="11" Opacity="0.4"
+                             IsVisible="{Binding SelectedRelease.PlatformDownloadUrl, Converter={x:Static StringConverters.IsNullOrEmpty}, FallbackValue=False}"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+          </StackPanel>
+        </ScrollViewer>
 
         <!-- Downloads -->
         <ScrollViewer Opacity="{Binding SelectedPage, Converter={StaticResource StringEqualityConverter}, ConverterParameter=Downloads}"
@@ -746,8 +1191,7 @@
                          Background="Transparent"
                          BorderThickness="0"
                          MaxHeight="280"
-                         ScrollViewer.VerticalScrollBarVisibility="Auto"
->
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
                   <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="vm:ReleaseViewModel">
                       <Grid ColumnDefinitions="*, Auto, Auto" Margin="0,2">
@@ -911,18 +1355,35 @@
                     Cursor="Hand"
                     Command="{Binding ToggleTaskPanelCommand}"
                     ToolTip.Tip="Background tasks">
-              <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <!-- Spinning indicator when tasks are running -->
                 <TextBlock Text="⟳" FontSize="13" VerticalAlignment="Center"
-                           Foreground="{DynamicResource StatusBarForeground}" Opacity="0.8"
-                           IsVisible="{Binding IsLoadingReleases}"/>
+                           Foreground="#0078D4"
+                           IsVisible="{Binding HasRunningTasks}"/>
+                <!-- Running task label -->
                 <TextBlock FontSize="11" VerticalAlignment="Center"
-                           Foreground="{DynamicResource StatusBarForeground}" Opacity="0.8">
+                           Foreground="{DynamicResource StatusBarForeground}" Opacity="0.85"
+                           IsVisible="{Binding HasRunningTasks}"
+                           TextTrimming="CharacterEllipsis" MaxWidth="180">
+                  <Run Text="{Binding RunningTaskLabel}"/>
+                  <Run Text="…"/>
+                </TextBlock>
+                <!-- Idle: task count summary -->
+                <TextBlock FontSize="11" VerticalAlignment="Center"
+                           Foreground="{DynamicResource StatusBarForeground}" Opacity="0.7"
+                           IsVisible="{Binding !HasRunningTasks}">
                   <Run Text="{Binding BackgroundTasks.Count}"/>
                   <Run Text="task(s)"/>
                 </TextBlock>
-                <Border Width="7" Height="7" CornerRadius="4" Background="#C42B1C"
-                        VerticalAlignment="Center"
-                        IsVisible="{Binding HasFailedTasks}"/>
+                <!-- Failed badge -->
+                <Border CornerRadius="3" Background="#C42B1C"
+                        Padding="4,1" VerticalAlignment="Center"
+                        IsVisible="{Binding HasFailedTasks}">
+                  <TextBlock FontSize="10" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center">
+                    <Run Text="{Binding FailedTaskCount}"/>
+                    <Run Text="failed"/>
+                  </TextBlock>
+                </Border>
               </StackPanel>
             </Button>
           </StackPanel>
@@ -947,39 +1408,60 @@
         </Transitions>
       </Border.Transitions>
       <StackPanel>
-        <Grid ColumnDefinitions="*, Auto" Margin="14,10,10,8">
+        <Grid ColumnDefinitions="*, Auto, Auto" Margin="14,10,10,8">
           <TextBlock Grid.Column="0" Text="Background tasks" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
-          <Button Grid.Column="1" Background="Transparent" BorderThickness="0"
+          <Button Grid.Column="1" Content="Clear done"
+                  FontSize="11" Padding="8,3" CornerRadius="4" Margin="0,0,6,0"
+                  Background="{DynamicResource SettingsGroupBackground}" BorderThickness="0"
+                  VerticalAlignment="Center"
+                  Command="{Binding ClearCompletedTasksCommand}"/>
+          <Button Grid.Column="2" Background="Transparent" BorderThickness="0"
                   Width="26" Height="26" Padding="4" VerticalAlignment="Center"
                   Command="{Binding ToggleTaskPanelCommand}">
             <PathIcon Data="{StaticResource dismiss_regular}" Width="11" Height="11"/>
           </Button>
         </Grid>
-        <Rectangle Height="1" Fill="{DynamicResource SettingsGroupBackground}" Margin="0,0,0,4"/>
+        <Rectangle Height="1" Fill="{DynamicResource SettingsGroupBackground}" Margin="0,0,0,2"/>
         <ItemsControl ItemsSource="{Binding BackgroundTasks}" Margin="0,4,0,8">
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="vm:BackgroundTaskViewModel">
-              <Grid ColumnDefinitions="Auto, *, Auto" Margin="14,5,10,5">
-                <TextBlock Grid.Column="0" Text="{Binding StatusGlyph}" FontSize="13"
-                           Width="18" VerticalAlignment="Center"
-                           Foreground="{Binding IsFailed, Converter={StaticResource BoolToAccentBrushConverter}}"/>
-                <StackPanel Grid.Column="1" Spacing="2" Margin="6,0" VerticalAlignment="Center">
-                  <TextBlock Text="{Binding Label}" FontSize="12"/>
-                  <TextBlock Text="{Binding ErrorMessage}" FontSize="11" Opacity="0.55"
-                             TextWrapping="Wrap"
-                             IsVisible="{Binding IsFailed}"/>
-                </StackPanel>
-                <Button Grid.Column="2" Content="↺ Retry"
-                        FontSize="11" Padding="8,4" CornerRadius="4"
-                        VerticalAlignment="Center"
-                        Command="{Binding RetryCommand}"
-                        IsVisible="{Binding IsFailed}"/>
-              </Grid>
+              <Border Padding="14,7,10,7">
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                  <!-- Status icon with colour -->
+                  <Border Grid.Column="0" Width="24" Height="24" CornerRadius="12"
+                          Background="{Binding StatusColor}" Opacity="0.15"
+                          VerticalAlignment="Center"/>
+                  <TextBlock Grid.Column="0" Text="{Binding StatusGlyph}" FontSize="12"
+                             Width="24" TextAlignment="Center" VerticalAlignment="Center"
+                             Foreground="{Binding StatusColor}"/>
+                  <!-- Label + detail -->
+                  <StackPanel Grid.Column="1" Spacing="2" Margin="10,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Label}" FontSize="12" FontWeight="Medium"/>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <TextBlock Text="{Binding Duration}" FontSize="10" Opacity="0.45"
+                                 IsVisible="{Binding Duration, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                      <TextBlock Text="{Binding ErrorMessage}" FontSize="10" Opacity="0.6"
+                                 Foreground="#C42B1C" TextWrapping="Wrap"
+                                 IsVisible="{Binding IsFailed}"/>
+                    </StackPanel>
+                    <ProgressBar IsIndeterminate="True" Height="2" CornerRadius="1"
+                                 Margin="0,3,0,0"
+                                 IsVisible="{Binding IsRunning}"/>
+                  </StackPanel>
+                  <!-- Retry button -->
+                  <Button Grid.Column="2" Content="↺ Retry"
+                          FontSize="11" Padding="8,4" CornerRadius="4"
+                          VerticalAlignment="Center"
+                          Command="{Binding RetryCommand}"
+                          IsVisible="{Binding IsFailed}"/>
+                </Grid>
+              </Border>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
       </StackPanel>
     </Border>
+
 
     <!-- Toast notification -->
     <Border HorizontalAlignment="Right" VerticalAlignment="Bottom"
