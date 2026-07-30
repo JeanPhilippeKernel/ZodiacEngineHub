@@ -6,7 +6,9 @@
 
 Panzerfaust is the official launcher and project manager for [ZEngine](https://github.com/JeanPhilippeKernel/RendererEngine). It lets game developers install and manage ZEngine versions, create and open projects, and browse local assets — all from a single desktop application.
 
-![Panzerfaust screenshot](docs/screenshot.png)
+| Projects | Assets store | Zodiac Engine |
+|---|---|---|
+| ![Projects page](docs/Screenshot%202026-07-30%20at%2021.09.45.png) | ![Assets store](docs/Screenshot%202026-07-30%20at%2021.10.50.png) | ![Zodiac Engine](docs/Screenshot%202026-07-30%20at%2021.11.18.png) |
 
 ---
 
@@ -14,7 +16,7 @@ Panzerfaust is the official launcher and project manager for [ZEngine](https://g
 
 - **Engine management** — download, install, and switch between ZEngine releases
 - **Project management** — create new projects, open existing ones, and launch them directly into the ZEngine editor
-- **Local asset browser** — browse and manage assets tied to your projects
+- **Local asset browser** — browse and manage assets grouped by asset ID, with per-version detail and mesh statistics
 - **Cross-platform** — runs natively on Windows, macOS (Intel & Apple Silicon), and Linux
 
 ---
@@ -75,6 +77,8 @@ dotnet publish Panzerfaust.csproj --configuration Release --runtime linux-x64 --
 ## Contributing
 
 See [Contributing.md](Contributing.md) for commit conventions, branch rules, and the release process. All pull requests must target the `develop` branch.
+
+For local development with a custom engine build, see [docs/local-engine-path.md](docs/local-engine-path.md).
 
 ---
 
