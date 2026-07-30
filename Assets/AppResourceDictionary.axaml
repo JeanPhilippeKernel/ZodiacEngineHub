@@ -11,8 +11,8 @@
   <conv:NullToVisibilityConverter x:Key="NullToVisible"/>
   <conv:NullToVisibilityConverter x:Key="NullToHidden" IsInverse="True"/>
   <conv:BoolToDoubleConverter x:Key="BoolToOpacity"/>
-  <conv:BoolToTransformConverter x:Key="ToastTransform" TrueValue="translateY(0)" FalseValue="translateY(20)"/>
-  <conv:BoolToTransformConverter x:Key="TaskPanelTransform" TrueValue="translateY(0)" FalseValue="translateY(10)"/>
+  <conv:BoolToTransformConverter x:Key="ToastTransform" TrueValue="translateY(0px)" FalseValue="translateY(20px)"/>
+  <conv:BoolToTransformConverter x:Key="TaskPanelTransform" TrueValue="translateY(0px)" FalseValue="translateY(10px)"/>
 
 
   <ResourceDictionary.ThemeDictionaries>
@@ -30,6 +30,13 @@
       <SolidColorBrush x:Key="StatusBarForeground">#FFFFFF</SolidColorBrush>
       <SolidColorBrush x:Key="TaskPanelBackground">#252525</SolidColorBrush>
       <SolidColorBrush x:Key="ContentForeground">#FFFFFF</SolidColorBrush>
+      <!-- Card hover action pill — dark scrim over thumbnail, same in both themes -->
+      <SolidColorBrush x:Key="CardHoverActionBackground">#AA000000</SolidColorBrush>
+      <!-- Rename inline buttons inside the card gradient overlay -->
+      <SolidColorBrush x:Key="CardRenameConfirmBackground">#440078D4</SolidColorBrush>
+      <SolidColorBrush x:Key="CardRenameCancelBackground">#33FFFFFF</SolidColorBrush>
+      <!-- Expanded versions panel background (local assets) -->
+      <SolidColorBrush x:Key="ExpandedPanelBackground">#2A2A2A</SolidColorBrush>
     </ResourceDictionary>
 
     <ResourceDictionary x:Key="Light">
@@ -45,6 +52,13 @@
       <SolidColorBrush x:Key="StatusBarForeground">#1A1A1A</SolidColorBrush>
       <SolidColorBrush x:Key="TaskPanelBackground">#F0F0F0</SolidColorBrush>
       <SolidColorBrush x:Key="ContentForeground">#111111</SolidColorBrush>
+      <!-- Card hover action pill — dark scrim over thumbnail, same in both themes -->
+      <SolidColorBrush x:Key="CardHoverActionBackground">#AA000000</SolidColorBrush>
+      <!-- Rename inline buttons inside the card gradient overlay -->
+      <SolidColorBrush x:Key="CardRenameConfirmBackground">#440078D4</SolidColorBrush>
+      <SolidColorBrush x:Key="CardRenameCancelBackground">#44000000</SolidColorBrush>
+      <!-- Expanded versions panel background (local assets) -->
+      <SolidColorBrush x:Key="ExpandedPanelBackground">#E0E0E0</SolidColorBrush>
     </ResourceDictionary>
 
   </ResourceDictionary.ThemeDictionaries>

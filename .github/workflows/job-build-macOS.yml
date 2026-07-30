@@ -32,6 +32,7 @@ jobs:
             --framework ${{ inputs.targetFramework }} \
             --runtime osx-${{ inputs.architecture }} \
             --self-contained true \
+            -p:PublishSingleFile=true \
             --output Result.Darwin.${{ inputs.architecture }}.${{ inputs.configuration }}/bin
 
       - name: Upload artifact

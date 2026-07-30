@@ -81,6 +81,12 @@ namespace Panzerfaust.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _projectCount, value);
         }
 
+        public string AppVersion { get; } =
+            System.Reflection.Assembly.GetExecutingAssembly()
+                .GetName().Version is { } v
+                ? $"v{v.Major}.{v.Minor}.{v.Build}"
+                : "v?";
+
         private string _statusBarMessage = string.Empty;
         public string StatusBarMessage
         {
@@ -141,7 +147,16 @@ namespace Panzerfaust.ViewModels
         private readonly ObservableCollection<AssetViewModel> _allAssets = new();
         public ObservableCollection<AssetViewModel> FilteredAssets { get; } = new();
         public ObservableCollection<LocalAssetViewModel> LocalAssets { get; } = new();
-        public bool HasLocalAssets => LocalAssets.Count > 0;
+        public ObservableCollection<LocalAssetGroupViewModel> LocalAssetGroups { get; } = new();
+        public bool HasLocalAssets => LocalAssetGroups.Count > 0;
+
+        private LocalAssetGroupViewModel? _expandedGroup;
+        public LocalAssetGroupViewModel? ExpandedGroup
+        {
+            get => _expandedGroup;
+            set => this.RaiseAndSetIfChanged(ref _expandedGroup, value);
+        }
+        public bool HasExpandedGroup => _expandedGroup != null;
 
         private string _assetSearchText = string.Empty;
         public string AssetSearchText
@@ -176,10 +191,25 @@ namespace Panzerfaust.ViewModels
             {
                 this.RaiseAndSetIfChanged(ref _selectedAssetDetail, value);
                 this.RaisePropertyChanged(nameof(IsAssetDetailOpen));
+                this.RaisePropertyChanged(nameof(IsRightPanelOpen));
             }
         }
 
-        public bool IsAssetDetailOpen => _selectedAssetDetail != null;
+        private LocalAssetDetailViewModel? _selectedLocalAssetDetail;
+        public LocalAssetDetailViewModel? SelectedLocalAssetDetail
+        {
+            get => _selectedLocalAssetDetail;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _selectedLocalAssetDetail, value);
+                this.RaisePropertyChanged(nameof(IsLocalAssetDetailOpen));
+                this.RaisePropertyChanged(nameof(IsRightPanelOpen));
+            }
+        }
+
+        public bool IsAssetDetailOpen      => _selectedAssetDetail != null;
+        public bool IsLocalAssetDetailOpen => _selectedLocalAssetDetail != null;
+        public bool IsRightPanelOpen       => IsAssetDetailOpen || IsLocalAssetDetailOpen;
 
         private bool _isTaskPanelOpen;
         public bool IsTaskPanelOpen
@@ -200,6 +230,25 @@ namespace Panzerfaust.ViewModels
         }
 
         public bool HasFailedTasks => _failedTaskCount > 0;
+
+        private int _runningTaskCount;
+        public int RunningTaskCount
+        {
+            get => _runningTaskCount;
+            private set
+            {
+                this.RaiseAndSetIfChanged(ref _runningTaskCount, value);
+                this.RaisePropertyChanged(nameof(HasRunningTasks));
+            }
+        }
+        public bool HasRunningTasks => _runningTaskCount > 0;
+
+        private string _runningTaskLabel = string.Empty;
+        public string RunningTaskLabel
+        {
+            get => _runningTaskLabel;
+            private set => this.RaiseAndSetIfChanged(ref _runningTaskLabel, value);
+        }
 
         private ProjectViewModel? _selectedProject;
         public ProjectViewModel? SelectedProject
@@ -233,6 +282,24 @@ namespace Panzerfaust.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _engineInstallLocation, value);
+                SaveSettings();
+                RefreshInstalledEngines();
+            }
+        }
+
+#if DEBUG
+        public bool IsDebugBuild => true;
+#else
+        public bool IsDebugBuild => false;
+#endif
+
+        private string _additionalEngineSearchPath = string.Empty;
+        public string AdditionalEngineSearchPath
+        {
+            get => _additionalEngineSearchPath;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _additionalEngineSearchPath, value);
                 SaveSettings();
                 RefreshInstalledEngines();
             }
@@ -317,8 +384,10 @@ namespace Panzerfaust.ViewModels
         public ReactiveCommand<Unit, Unit> CancelDeleteCommand { get; }
         public ReactiveCommand<Unit, Unit> BrowseDefaultLocationCommand { get; }
         public ReactiveCommand<Unit, Unit> BrowseEngineInstallLocationCommand { get; }
+        public ReactiveCommand<Unit, Unit> BrowseAdditionalEnginePathCommand { get; }
         public ReactiveCommand<Unit, Unit> ToggleToastCommand { get; }
         public ReactiveCommand<Unit, Unit> ToggleTaskPanelCommand { get; }
+        public ReactiveCommand<Unit, Unit> ClearCompletedTasksCommand { get; }
         public Interaction<ProjectWindowViewModel, ProjectViewModel?> NewProjectDialog { get; } = new();
         public Interaction<string, bool> DeleteProjectInteraction { get; } = new();
         public Interaction<string, bool> ConfirmOverwriteInteraction { get; } = new();
@@ -371,9 +440,15 @@ namespace Panzerfaust.ViewModels
             CancelDeleteCommand = ReactiveCommand.Create(OnCancelDelete);
             BrowseDefaultLocationCommand = ReactiveCommand.CreateFromTask(OnBrowseDefaultLocation);
             BrowseEngineInstallLocationCommand = ReactiveCommand.CreateFromTask(OnBrowseEngineInstallLocation);
+            BrowseAdditionalEnginePathCommand = ReactiveCommand.CreateFromTask(OnBrowseAdditionalEnginePath);
             ToggleToastCommand = ReactiveCommand.Create(() => { IsToastExpanded = !IsToastExpanded; });
             ToggleTaskPanelCommand = ReactiveCommand.Create(() => { IsTaskPanelOpen = !IsTaskPanelOpen; });
-
+            ClearCompletedTasksCommand = ReactiveCommand.Create(() =>
+            {
+                var done = BackgroundTasks.Where(t => !t.IsRunning).ToList();
+                foreach (var t in done) BackgroundTasks.Remove(t);
+                UpdateTaskCounts();
+            });
             DeleteProjectInteraction.RegisterHandler(async ctx =>
             {
                 DeleteModalProjectName = ctx.Input;
@@ -480,8 +555,9 @@ namespace Panzerfaust.ViewModels
             }
 
             StatusBarMessage = $"{label}…";
+            UpdateTaskCounts();
             await task.RunAsync();
-            UpdateFailedCount();
+            UpdateTaskCounts();
 
             if (task.IsSucceeded)
                 StatusBarMessage = $"{label} — done";
@@ -492,8 +568,14 @@ namespace Panzerfaust.ViewModels
             }
         }
 
-        private void UpdateFailedCount() =>
+        private void UpdateFailedCount() => UpdateTaskCounts();
+
+        private void UpdateTaskCounts()
+        {
             FailedTaskCount = BackgroundTasks.Count(t => t.IsFailed);
+            RunningTaskCount = BackgroundTasks.Count(t => t.IsRunning);
+            RunningTaskLabel = BackgroundTasks.FirstOrDefault(t => t.IsRunning)?.Label ?? string.Empty;
+        }
 
         private async Task FetchReleasesCore()
         {
@@ -556,6 +638,13 @@ namespace Panzerfaust.ViewModels
             var folder = await _storageService.PickDirectoryAsync();
             if (folder != null)
                 EngineInstallLocation = folder.Path.LocalPath;
+        }
+
+        private async Task OnBrowseAdditionalEnginePath()
+        {
+            var folder = await _storageService.PickDirectoryAsync();
+            if (folder != null)
+                AdditionalEngineSearchPath = folder.Path.LocalPath;
         }
 
         private async Task DownloadReleaseAsync(ReleaseViewModel release)
@@ -727,6 +816,7 @@ namespace Panzerfaust.ViewModels
 
         private void OnShowAssetDetail(AssetViewModel asset)
         {
+            SelectedLocalAssetDetail = null;
             var detail = new AssetDetailViewModel(asset, LoadAndDownloadAssetAsync, () => SelectedAssetDetail = null);
             SelectedAssetDetail = detail;
             _ = LoadAssetFormatsAsync(detail);
@@ -755,7 +845,24 @@ namespace Panzerfaust.ViewModels
                                     {
                                         var url = fileObj["url"]?.GetValue<string>() ?? string.Empty;
                                         if (!string.IsNullOrEmpty(url))
-                                            detail.FormatOptions.Add(new AssetFormatOption(fmt, res, url));
+                                        {
+                                            var option = new AssetFormatOption(fmt, res, url);
+                                            // collect companion files from "include" (e.g. .bin buffer, textures)
+                                            if (fileObj.TryGetPropertyValue("include", out var incNode)
+                                                && incNode is System.Text.Json.Nodes.JsonObject incObj)
+                                            {
+                                                foreach (var inc in incObj)
+                                                {
+                                                    if (inc.Value is System.Text.Json.Nodes.JsonObject incFile)
+                                                    {
+                                                        var incUrl = incFile["url"]?.GetValue<string>() ?? string.Empty;
+                                                        if (!string.IsNullOrEmpty(incUrl))
+                                                            option.CompanionUrls.Add(incUrl);
+                                                    }
+                                                }
+                                            }
+                                            detail.FormatOptions.Add(option);
+                                        }
                                     }
                                 }
                             }
@@ -812,24 +919,23 @@ namespace Panzerfaust.ViewModels
                 try
                 {
                     Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destPath)!);
-                    using var response = await _downloadClient.GetAsync(fmt.Url, HttpCompletionOption.ResponseHeadersRead);
-                    response.EnsureSuccessStatusCode();
-                    var total = response.Content.Headers.ContentLength ?? -1L;
-                    using var fs = File.Create(destPath);
-                    using var stream = await response.Content.ReadAsStreamAsync();
-                    var buffer = new byte[81920];
-                    long downloaded = 0;
-                    int lastPct = -1, read;
-                    while ((read = await stream.ReadAsync(buffer)) > 0)
+
+                    await DownloadFileWithProgressAsync(fmt.Url, destPath,
+                        pct => UI(() => { op.Progress = pct; }));
+
+                    // Download companion files (e.g. .bin buffer for GLTF)
+                    var destDir2 = System.IO.Path.GetDirectoryName(destPath)!;
+                    foreach (var companionUrl in fmt.CompanionUrls)
                     {
-                        await fs.WriteAsync(buffer.AsMemory(0, read));
-                        downloaded += read;
-                        if (total > 0)
+                        try
                         {
-                            var pct = (int)(downloaded * 100 / total);
-                            if (pct != lastPct) { lastPct = pct; await UI(() => { op.Progress = pct; }); }
+                            var companionFileName = System.IO.Path.GetFileName(new Uri(companionUrl).LocalPath);
+                            var companionDest = System.IO.Path.Combine(destDir2, companionFileName);
+                            await DownloadFileWithProgressAsync(companionUrl, companionDest, _ => Task.CompletedTask);
                         }
+                        catch { /* non-fatal */ }
                     }
+
                     await UI(() => { op.Status = DownloadOperationStatus.Done; op.Progress = 100; });
                     await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(ScanLocalAssets);
                 }
@@ -853,10 +959,70 @@ namespace Panzerfaust.ViewModels
                 {
                     var resolution = Path.GetFileName(resDir);
                     foreach (var file in Directory.EnumerateFiles(resDir))
-                        LocalAssets.Add(new LocalAssetViewModel(assetId, resolution, file, ShowLocalAssetInFinder, DeleteLocalAssetAsync));
+                    {
+                        var ext = Path.GetExtension(file).TrimStart('.').ToLowerInvariant();
+                        // skip companion files — only show the primary asset
+                        if (ext is "bin" or "jpg" or "jpeg" or "png" or "webp" or "hdr" or "exr") continue;
+                        LocalAssets.Add(new LocalAssetViewModel(assetId, resolution, file, ShowLocalAssetInFinder, DeleteLocalAssetAsync, OpenLocalAssetDetail));
+                    }
                 }
             }
+
+            ExpandedGroup = null;
+            LocalAssetGroups.Clear();
+            foreach (var group in LocalAssets.GroupBy(a => a.AssetId, StringComparer.OrdinalIgnoreCase))
+                LocalAssetGroups.Add(new LocalAssetGroupViewModel(group.Key, group, OpenLocalAssetDetail, ToggleExpandedGroup));
+
             this.RaisePropertyChanged(nameof(HasLocalAssets));
+            RefreshDownloadedStates();
+        }
+
+        private void RefreshDownloadedStates()
+        {
+            var ids = LocalAssets.Select(a => a.AssetId)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            foreach (var asset in _allAssets)
+                asset.RefreshDownloadedState(ids);
+        }
+
+        private async Task DownloadFileWithProgressAsync(string url, string destPath, Func<int, Task> onProgress)
+        {
+            using var response = await _downloadClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            response.EnsureSuccessStatusCode();
+            var total = response.Content.Headers.ContentLength ?? -1L;
+            using var fs = File.Create(destPath);
+            using var stream = await response.Content.ReadAsStreamAsync();
+            var buf = new byte[81920];
+            long downloaded = 0;
+            int lastPct = -1, read;
+            while ((read = await stream.ReadAsync(buf)) > 0)
+            {
+                await fs.WriteAsync(buf.AsMemory(0, read));
+                downloaded += read;
+                if (total > 0)
+                {
+                    var pct = (int)(downloaded * 100 / total);
+                    if (pct != lastPct) { lastPct = pct; await onProgress(pct); }
+                }
+            }
+        }
+
+        private void ToggleExpandedGroup(LocalAssetGroupViewModel group)
+        {
+            var prev = _expandedGroup;
+            ExpandedGroup = ReferenceEquals(_expandedGroup, group) ? null : group;
+            if (prev != null) prev.IsExpanded = false;
+            if (_expandedGroup != null) _expandedGroup.IsExpanded = true;
+            this.RaisePropertyChanged(nameof(HasExpandedGroup));
+        }
+
+        private void OpenLocalAssetDetail(LocalAssetViewModel asset)
+        {
+            SelectedAssetDetail = null;
+            SelectedLocalAssetDetail = new LocalAssetDetailViewModel(
+                asset,
+                closeHandler: () => { SelectedLocalAssetDetail = null; },
+                showInFinderHandler: ShowLocalAssetInFinder);
         }
 
         private void ShowLocalAssetInFinder(LocalAssetViewModel asset)
@@ -883,12 +1049,26 @@ namespace Panzerfaust.ViewModels
             {
                 if (File.Exists(asset.FilePath))
                     File.Delete(asset.FilePath);
+
                 var resDir = Path.GetDirectoryName(asset.FilePath);
-                if (resDir != null && Directory.Exists(resDir) && !Directory.EnumerateFileSystemEntries(resDir).Any())
-                    Directory.Delete(resDir);
+                if (resDir != null && Directory.Exists(resDir))
+                {
+                    // Only wipe the resolution folder when no other primary assets remain.
+                    // Multiple formats (gltf, fbx, …) can share the same resolution directory.
+                    static string Ext(string f) =>
+                        Path.GetExtension(f).TrimStart('.').ToLowerInvariant();
+                    bool otherPrimariesExist = Directory.EnumerateFiles(resDir)
+                        .Any(f => Ext(f) is not ("bin" or "jpg" or "jpeg" or "png" or "webp" or "hdr" or "exr"));
+
+                    if (!otherPrimariesExist)
+                        Directory.Delete(resDir, recursive: true);
+                }
+
                 var assetDir = resDir != null ? Path.GetDirectoryName(resDir) : null;
-                if (assetDir != null && Directory.Exists(assetDir) && !Directory.EnumerateFileSystemEntries(assetDir).Any())
+                if (assetDir != null && Directory.Exists(assetDir)
+                    && !Directory.EnumerateFileSystemEntries(assetDir).Any())
                     Directory.Delete(assetDir);
+
                 ScanLocalAssets();
             }
             catch { }
@@ -897,8 +1077,20 @@ namespace Panzerfaust.ViewModels
         private void RefreshInstalledEngines()
         {
             InstalledEngines.Clear();
+            var seen = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var e in _engineService.ScanInstalledEngines(_engineInstallLocation))
-                InstalledEngines.Add(new InstalledEngineViewModel(e, UninstallEngineAsync));
+            {
+                if (seen.Add(e.InstallPath))
+                    InstalledEngines.Add(new InstalledEngineViewModel(e, UninstallEngineAsync));
+            }
+            if (!string.IsNullOrWhiteSpace(_additionalEngineSearchPath))
+            {
+                foreach (var e in _engineService.ScanInstalledEngines(_additionalEngineSearchPath))
+                {
+                    if (seen.Add(e.InstallPath))
+                        InstalledEngines.Add(new InstalledEngineViewModel(e, UninstallEngineAsync));
+                }
+            }
             this.RaisePropertyChanged(nameof(HasInstalledEngines));
         }
 
@@ -946,6 +1138,8 @@ namespace Panzerfaust.ViewModels
                         Avalonia.Application.Current.RequestedThemeVariant =
                             theme == "Light" ? ThemeVariant.Light : ThemeVariant.Dark;
                 }
+                if (doc.RootElement.TryGetProperty("AdditionalEngineSearchPath", out var addPathEl) && addPathEl.GetString() is string addPath)
+                    _additionalEngineSearchPath = addPath;
             }
             catch { }
         }
@@ -954,7 +1148,7 @@ namespace Panzerfaust.ViewModels
         {
             try
             {
-                var json = JsonSerializer.Serialize(new { DefaultProjectLocation, EngineInstallLocation, SelectedTheme }, new JsonSerializerOptions { WriteIndented = true });
+                var json = JsonSerializer.Serialize(new { DefaultProjectLocation, EngineInstallLocation, SelectedTheme, AdditionalEngineSearchPath }, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(SettingsPath, json);
             }
             catch { }

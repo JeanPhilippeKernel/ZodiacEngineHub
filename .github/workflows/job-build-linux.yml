@@ -29,6 +29,7 @@ jobs:
             --framework ${{ inputs.targetFramework }} \
             --runtime linux-x64 \
             --self-contained true \
+            -p:PublishSingleFile=true \
             --output Result.Linux.x64.${{ inputs.configuration }}/bin
 
       - name: Upload artifact

@@ -6,6 +6,13 @@
         ".": {
             "release-type": "simple",
             "version-file": "VERSION.txt",
+            "extra-files": [
+                {
+                    "type": "xml",
+                    "path": "Panzerfaust.csproj",
+                    "xpath": "//Project/PropertyGroup/Version"
+                }
+            ],
             "changelog-sections": [
                 {"type": "feat",     "section": "Features"},
                 {"type": "fix",      "section": "Bug Fixes"},

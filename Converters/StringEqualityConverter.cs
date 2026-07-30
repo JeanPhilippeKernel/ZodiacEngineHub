@@ -1,4 +1,6 @@
 using Avalonia.Data.Converters;
+using Avalonia.Media;
+using Avalonia.Media.Transformation;
 using System;
 using System.Globalization;
 
@@ -13,6 +15,8 @@ namespace Panzerfaust.Converters
             bool match = value is string s && s == parameter as string;
             if (targetType == typeof(double)) return match ? 1.0 : 0.0;
             if (targetType == typeof(string)) return match ? "scaleY(1)" : "scaleY(0.3)";
+            if (typeof(ITransform).IsAssignableFrom(targetType))
+                return TransformOperations.Parse(match ? "scaleY(1)" : "scaleY(0.3)");
             return match;
         }
 

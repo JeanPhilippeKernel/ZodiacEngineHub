@@ -1,0 +1,74 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-debug",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/Panzerfaust.csproj",
+        "--configuration", "Debug",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary;ForceNoAlign"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "publish-release",
+      "type": "shell",
+      "windows": {
+        "command": "dotnet publish \"${workspaceFolder}/Panzerfaust.csproj\" --configuration Release --runtime win-x64 --self-contained true /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary;ForceNoAlign"
+      },
+      "linux": {
+        "command": "dotnet publish \"${workspaceFolder}/Panzerfaust.csproj\" --configuration Release --runtime linux-x64 --self-contained true /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary;ForceNoAlign"
+      },
+      "osx": {
+        "command": "ARCH=$(uname -m | sed s/x86_64/x64/ | sed s/arm64/arm64/) && dotnet publish \"${workspaceFolder}/Panzerfaust.csproj\" --configuration Release --runtime osx-$ARCH --self-contained true /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary;ForceNoAlign"
+      },
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "clean",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "clean",
+        "${workspaceFolder}/Panzerfaust.csproj"
+      ],
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "watch",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "watch",
+        "run",
+        "--project", "${workspaceFolder}/Panzerfaust.csproj"
+      ],
+      "problemMatcher": "$msCompile",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}
