@@ -78,6 +78,8 @@ dotnet publish Panzerfaust.csproj --configuration Release --runtime linux-x64 --
 
 See [Contributing.md](Contributing.md) for commit conventions, branch rules, and the release process. All pull requests must target the `develop` branch.
 
+For local development with a custom engine build, see [docs/local-engine-path.md](docs/local-engine-path.md).
+
 ---
 
 ## License
