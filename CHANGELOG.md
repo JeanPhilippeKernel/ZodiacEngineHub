@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.3.0](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.2.0...v1.3.0) (2026-07-30)
+
+
+### Features
+
+* assets page redesign, local asset grouping, project card modernization ([#16](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/16)) ([ae27d32](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/ae27d32a9a54cc50b2b23e8d1d1ca897c7b93191))
+* configure VS Code for cross-platform debugging and fix binding errors ([#15](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/15)) ([e08d69c](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/e08d69cd2efd6ce89e680940557a57038cf9624b))
+* show app release version in status bar ([#14](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/14)) ([5315617](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/5315617f48eee0656da496502f1541c15273e126))
+
+
+### Documentation
+
+* add README with features, downloads, system requirements and build instructions ([#12](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/12)) ([9ca1e05](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/9ca1e056d70d2b753ae070338c681b1f93976f0a))
+* update README with current screenshots ([#17](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/17)) ([f3b3555](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/f3b3555c4e0abc5dba71b3ab00e64c3a6f7adea5))
+
+
+### CI/CD
+
+* enable single-file publish across all platform build jobs ([#13](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/13)) ([f92afae](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/f92afae642d39d54d87ecf7ff16c86a0858cc3b4))
+
 ## [1.2.0](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.1.0...v1.2.0) (2026-07-29)
 
 
