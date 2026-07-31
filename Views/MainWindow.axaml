@@ -1538,5 +1538,11 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
 
     </Panel>
 
+    <!-- RC build indicator — orange border overlay, invisible in stable releases -->
+    <Border IsHitTestVisible="False"
+            BorderThickness="2"
+            BorderBrush="#FF8C00"
+            IsVisible="{Binding IsRcBuild}"/>
+
   </Panel>
 </Window>

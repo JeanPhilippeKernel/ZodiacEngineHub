@@ -87,6 +87,13 @@ namespace Panzerfaust.ViewModels
                 ? $"v{v.Major}.{v.Minor}.{v.Build}"
                 : "v?";
 
+        public bool IsRcBuild { get; } =
+            System.Reflection.Assembly.GetExecutingAssembly()
+                .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+                .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
+                .FirstOrDefault()?.InformationalVersion
+                    .Contains("-rc", StringComparison.OrdinalIgnoreCase) == true;
+
         private string _statusBarMessage = string.Empty;
         public string StatusBarMessage
         {
