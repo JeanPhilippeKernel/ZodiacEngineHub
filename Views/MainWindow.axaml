@@ -10,11 +10,7 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
         MinWidth="800" MinHeight="600"
         Width="1500" Height="800"
         Title="Panzerfaust"
-        TransparencyLevelHint="AcrylicBlur"
-        Background="Transparent"
-        ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="PreferSystemChrome"
-        ExtendClientAreaTitleBarHeightHint="-1">
+        Background="{DynamicResource WindowBackground}">
 
   <Window.Styles>
     <Style Selector="Border.navMarker">
@@ -61,15 +57,7 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
 
   <Panel>
 
-    <ExperimentalAcrylicBorder IsHitTestVisible="False">
-      <ExperimentalAcrylicBorder.Material>
-        <ExperimentalAcrylicMaterial BackgroundSource="Digger"
-                                     TintColor="{DynamicResource AcrylicTintColor}"
-                                     TintOpacity="6" MaterialOpacity="0.65"/>
-      </ExperimentalAcrylicBorder.Material>
-    </ExperimentalAcrylicBorder>
-
-    <Grid x:Name="RootContent" ColumnDefinitions="Auto, *, Auto" RowDefinitions="*, Auto">
+<Grid x:Name="RootContent" ColumnDefinitions="Auto, *, Auto" RowDefinitions="*, Auto">
 
       <!-- ══════════════════════════════════════
            Sidebar — Column 0

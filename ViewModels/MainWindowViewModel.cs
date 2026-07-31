@@ -404,8 +404,6 @@ namespace Panzerfaust.ViewModels
             _polyHavenService = polyHavenService;
             _projectWindowVmFactory = projectWindowVmFactory;
             LoadSettings();
-            RefreshInstalledEngines();
-            ScanLocalAssets();
             LoadDownloadHistory();
 
             var filterPredicate = this.WhenAnyValue(x => x.SearchText)
@@ -424,7 +422,13 @@ namespace Panzerfaust.ViewModels
                 .ToCollection()
                 .Subscribe(col => ProjectCount = col.Count);
 
-            RxApp.MainThreadScheduler.Schedule(() => { _ = LoadProjectsAsync(); });
+            RxApp.MainThreadScheduler.Schedule(() =>
+            {
+                _ = RunBackgroundTask("Scan engines", () => Task.Run(RefreshInstalledEngines));
+                _ = RunBackgroundTask("Scan local assets", () => Task.Run(() =>
+                    Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(ScanLocalAssets)));
+                _ = RunBackgroundTask("Load projects", LoadProjectsAsync);
+            });
 
             var canConfirm = this.WhenAnyValue(
                 x => x.DeleteConfirmText,

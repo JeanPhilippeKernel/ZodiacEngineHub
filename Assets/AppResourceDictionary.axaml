@@ -18,7 +18,7 @@
   <ResourceDictionary.ThemeDictionaries>
 
     <ResourceDictionary x:Key="Dark">
-      <Color x:Key="AcrylicTintColor">Black</Color>
+      <SolidColorBrush x:Key="WindowBackground">#1E1E1E</SolidColorBrush>
       <SolidColorBrush x:Key="SidebarBackground">#1A1A1A</SolidColorBrush>
       <SolidColorBrush x:Key="SettingsGroupBackground">#22FFFFFF</SolidColorBrush>
       <SolidColorBrush x:Key="CardBackground">#22FFFFFF</SolidColorBrush>
@@ -40,7 +40,7 @@
     </ResourceDictionary>
 
     <ResourceDictionary x:Key="Light">
-      <Color x:Key="AcrylicTintColor">White</Color>
+      <SolidColorBrush x:Key="WindowBackground">#F5F5F5</SolidColorBrush>
       <SolidColorBrush x:Key="SidebarBackground">#E8E8E8</SolidColorBrush>
       <SolidColorBrush x:Key="SettingsGroupBackground">#18000000</SolidColorBrush>
       <SolidColorBrush x:Key="CardBackground">#18000000</SolidColorBrush>
