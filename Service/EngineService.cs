@@ -61,21 +61,70 @@ namespace Panzerfaust.Service
             List<string> engineArgs = new() { _projectFileCommandLineArgs, configPath, _launchEditorFlag, _launchEditorValue };
 
             var workingDir = Path.GetDirectoryName(engineBinaryPath) ?? _workingDirectory;
+
             var processStartInfo = new ProcessStartInfo(engineBinaryPath)
             {
                 UseShellExecute = false,
                 WorkingDirectory = workingDir
             };
+
+            // Extend the dynamic library search path so the engine finds its bundled dylibs.
+            // Covers two layouts:
+            //   - GitHub release zip: dylibs sit next to the binary (workingDir)
+            //   - Local dev build:    dylibs are in a lib/ folder somewhere up the tree
+            var searchDirs = new List<string> { workingDir };
+            var dir = workingDir;
+            for (var i = 0; i < 4; i++)
+            {
+                dir = Path.GetDirectoryName(dir);
+                if (dir == null) break;
+                var candidate = Path.Combine(dir, "lib");
+                if (Directory.Exists(candidate))
+                {
+                    searchDirs.Add(candidate);
+                    break;
+                }
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                var existing = processStartInfo.Environment.TryGetValue("PATH", out var cur) ? cur : "";
+                var extraPaths = string.Join(";", searchDirs);
+                processStartInfo.Environment["PATH"] = string.IsNullOrEmpty(existing)
+                    ? extraPaths : $"{extraPaths};{existing}";
+            }
+            else
+            {
+                var envVar = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "DYLD_LIBRARY_PATH" : "LD_LIBRARY_PATH";
+                var separator = ":";
+                var existing = processStartInfo.Environment.TryGetValue(envVar, out var cur) ? cur : "";
+                var extraPaths = string.Join(separator, searchDirs);
+                processStartInfo.Environment[envVar] = string.IsNullOrEmpty(existing)
+                    ? extraPaths : $"{extraPaths}{separator}{existing}";
+            }
             foreach (var arg in engineArgs)
                 processStartInfo.ArgumentList.Add(arg);
 
+            if (!File.Exists(engineBinaryPath))
+                throw new Exception($"Engine binary not found: {engineBinaryPath}");
+
+            if (!File.Exists(configPath))
+                throw new Exception($"Project config not found: {configPath}");
+
+            processStartInfo.RedirectStandardOutput = true;
+            processStartInfo.RedirectStandardError = true;
+
             var engineProcess = Process.Start(processStartInfo)!;
 
-            // WaitForInputIdle is Windows-only and only applies to GUI apps with a message pump.
-            // Give the process a short grace period then check for an immediate bad exit code.
-            await Task.Delay(300);
-            if (engineProcess.HasExited && engineProcess.ExitCode == -2)
-                throw new Exception("Failed to start the engine, invalid args");
+            // Wait up to 3s — long enough to catch fast crashes, short enough not to block.
+            var exited = await Task.Run(() => engineProcess.WaitForExit(3000));
+            if (exited)
+            {
+                var stderr = await engineProcess.StandardError.ReadToEndAsync();
+                var stdout = await engineProcess.StandardOutput.ReadToEndAsync();
+                var output = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
+                throw new Exception($"Engine exited (code {engineProcess.ExitCode}){(string.IsNullOrWhiteSpace(output) ? "" : $": {output.Trim()}")}");
+            }
         }
     }
 }
