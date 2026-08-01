@@ -10,7 +10,10 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
         MinWidth="800" MinHeight="600"
         Width="1500" Height="800"
         Title="Panzerfaust"
-        Background="{DynamicResource WindowBackground}">
+        Background="{DynamicResource WindowBackground}"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="PreferSystemChrome"
+        ExtendClientAreaTitleBarHeightHint="-1">
 
   <Window.Styles>
     <Style Selector="Border.navMarker">
@@ -55,7 +58,7 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
     </Style>
   </Window.Styles>
 
-  <Panel>
+  <Panel x:Name="RootPanel">
 
 <Grid x:Name="RootContent" ColumnDefinitions="Auto, *, Auto" RowDefinitions="*, Auto">
 
@@ -1538,11 +1541,20 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
 
     </Panel>
 
-    <!-- RC build indicator — orange border overlay, invisible in stable releases -->
+    <!-- RC build indicator — orange glow border overlay, invisible in stable releases -->
     <Border IsHitTestVisible="False"
-            BorderThickness="2"
-            BorderBrush="#FF8C00"
-            IsVisible="{Binding IsRcBuild}"/>
+            BorderThickness="3"
+            CornerRadius="4"
+            BoxShadow="0 0 0 2 #CC6600, 0 0 12 4 #99FF8C00, 0 0 28 8 #55FF8C00"
+            IsVisible="{Binding IsRcBuild}">
+      <Border.BorderBrush>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+          <GradientStop Color="#FFAA00" Offset="0"/>
+          <GradientStop Color="#FF6600" Offset="0.5"/>
+          <GradientStop Color="#FFAA00" Offset="1"/>
+        </LinearGradientBrush>
+      </Border.BorderBrush>
+    </Border>
 
   </Panel>
 </Window>

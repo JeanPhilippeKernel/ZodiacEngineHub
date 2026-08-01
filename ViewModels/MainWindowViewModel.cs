@@ -83,15 +83,20 @@ namespace Panzerfaust.ViewModels
 
         public string AppVersion { get; } =
             System.Reflection.Assembly.GetExecutingAssembly()
-                .GetName().Version is { } v
-                ? $"v{v.Major}.{v.Minor}.{v.Build}"
-                : "v?";
+                .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+                .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
+                .FirstOrDefault()?.InformationalVersion.Split('+')[0] is { Length: > 0 } v
+                ? $"v{v}"
+                : System.Reflection.Assembly.GetExecutingAssembly()
+                    .GetName().Version is { } av
+                    ? $"v{av.Major}.{av.Minor}.{av.Build}"
+                    : "v?";
 
         public bool IsRcBuild { get; } =
             System.Reflection.Assembly.GetExecutingAssembly()
                 .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
                 .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
-                .FirstOrDefault()?.InformationalVersion
+                .FirstOrDefault()?.InformationalVersion.Split('+')[0]
                     .Contains("-rc", StringComparison.OrdinalIgnoreCase) == true;
 
         private string _statusBarMessage = string.Empty;
