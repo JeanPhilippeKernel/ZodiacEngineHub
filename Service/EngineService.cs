@@ -133,8 +133,10 @@ namespace Panzerfaust.Service
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                // Ad-hoc re-sign every binary and dylib in the install tree.
+                // TEMPORARY: Ad-hoc re-sign every binary and dylib in the install tree.
                 // GitHub release zips corrupt existing signatures; Gatekeeper SIGKILLs (137) anything invalid.
+                // Remove this block once the Obelisk CI pipeline signs with a Developer ID and packages
+                // with `ditto` instead of `zip`. See ZEngine/docs/macos-codesign-distribution.md.
                 var installRoot = Path.GetDirectoryName(workingDir) ?? workingDir;
                 var signable = Directory.EnumerateFiles(installRoot, "*", SearchOption.AllDirectories)
                     .Where(f =>
