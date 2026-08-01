@@ -111,6 +111,14 @@ namespace Panzerfaust.Service
             if (!File.Exists(configPath))
                 throw new Exception($"Project config not found: {configPath}");
 
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                var mode = File.GetUnixFileMode(engineBinaryPath);
+                if (!mode.HasFlag(UnixFileMode.UserExecute))
+                    File.SetUnixFileMode(engineBinaryPath,
+                        mode | UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
+            }
+
             processStartInfo.RedirectStandardOutput = true;
             processStartInfo.RedirectStandardError = true;
 
