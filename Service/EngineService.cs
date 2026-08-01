@@ -113,10 +113,47 @@ namespace Panzerfaust.Service
 
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                var mode = File.GetUnixFileMode(engineBinaryPath);
-                if (!mode.HasFlag(UnixFileMode.UserExecute))
-                    File.SetUnixFileMode(engineBinaryPath,
-                        mode | UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
+                // GitHub release zips extract without execute bits — fix all binaries/tools in the bin dir.
+                // Do this before codesign so we don't invalidate an existing signature via chmod.
+                var nonDataFiles = Directory.EnumerateFiles(workingDir)
+                    .Where(f =>
+                    {
+                        var ext = System.IO.Path.GetExtension(f).ToLowerInvariant();
+                        return ext is not (".dylib" or ".so" or ".json" or ".txt" or ".md" or ".xml" or ".plist" or ".ini" or ".png" or ".hdr");
+                    });
+
+                foreach (var exe in nonDataFiles)
+                {
+                    var mode = File.GetUnixFileMode(exe);
+                    if (!mode.HasFlag(UnixFileMode.UserExecute))
+                        File.SetUnixFileMode(exe,
+                            mode | UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
+                }
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                // Ad-hoc re-sign every binary and dylib in the install tree.
+                // GitHub release zips corrupt existing signatures; Gatekeeper SIGKILLs (137) anything invalid.
+                var installRoot = Path.GetDirectoryName(workingDir) ?? workingDir;
+                var signable = Directory.EnumerateFiles(installRoot, "*", SearchOption.AllDirectories)
+                    .Where(f =>
+                    {
+                        var ext = System.IO.Path.GetExtension(f).ToLowerInvariant();
+                        return ext is ".dylib" or ".so" or ""
+                            || (ext == string.Empty && File.GetUnixFileMode(f).HasFlag(UnixFileMode.UserExecute));
+                    });
+
+                foreach (var target in signable)
+                {
+                    using var cs = Process.Start(new ProcessStartInfo("codesign")
+                    {
+                        UseShellExecute = false,
+                        RedirectStandardError = true,
+                        ArgumentList = { "--force", "--sign", "-", target }
+                    })!;
+                    await Task.Run(() => cs.WaitForExit(10000));
+                }
             }
 
             processStartInfo.RedirectStandardOutput = true;
