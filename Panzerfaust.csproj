@@ -82,25 +82,26 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Avalonia" Version="11.2.1"/>
-		<PackageReference Include="Avalonia.Desktop" Version="11.2.1"/>
-		<PackageReference Include="Avalonia.ReactiveUI" Version="11.2.1"/>
-		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1"/>
-		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1"/>
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2"/>
-		<PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5"/>
-		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.1"/>
-		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.1"/>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0"/>
-		<PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc2"/>
-		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0"/>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
-		<PackageReference Include="Tmds.DBus.Protocol" Version="0.94.2"/>
+		<PackageReference Include="Avalonia" Version="11.2.1" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="11.2.1" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+		<PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.1" />
+		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+		<PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc2" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<!-- Pinned to match Avalonia.FreeDesktop 11.2.1 which was compiled against this exact version -->
+		<PackageReference Include="Tmds.DBus.Protocol" Version="0.20.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Assets\Images\coding_image.jpg"/>
-		<EmbeddedResource Include="Assets\Images\image_2.jpg"/>
+		<EmbeddedResource Include="Assets\Images\coding_image.jpg" />
+		<EmbeddedResource Include="Assets\Images\image_2.jpg" />
 	</ItemGroup>
 
 	<ItemGroup>
