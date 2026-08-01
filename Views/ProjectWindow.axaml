@@ -10,18 +10,9 @@
         Width="712" Height="712"
         MaxHeight="712" MaxWidth="712"
         MinHeight="712" MinWidth="712"
-        TransparencyLevelHint="AcrylicBlur"
-        Background="Transparent"
-        ExtendClientAreaToDecorationsHint="True" WindowStartupLocation="CenterOwner" CanResize="False">
-  <Panel>
-    <ExperimentalAcrylicBorder IsHitTestVisible="False">
-      <ExperimentalAcrylicBorder.Material>
-        <ExperimentalAcrylicMaterial BackgroundSource="Digger" TintColor="{DynamicResource AcrylicTintColor}" TintOpacity="6" MaterialOpacity="0.65"/>
-      </ExperimentalAcrylicBorder.Material>
-    </ExperimentalAcrylicBorder>    
-    
-    <Panel Margin="40">
-      <views:CreateProjectView />
-    </Panel>
+        Background="{DynamicResource WindowBackground}"
+        WindowStartupLocation="CenterOwner" CanResize="False">
+  <Panel Margin="40">
+    <views:CreateProjectView />
   </Panel>
 </Window>

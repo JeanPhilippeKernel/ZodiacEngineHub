@@ -14,6 +14,11 @@ namespace Panzerfaust.Views
         public MainWindow()
         {
             InitializeComponent();
+            this.PropertyChanged += (_, e) =>
+            {
+                if (e.Property == Window.WindowDecorationMarginProperty)
+                    RootPanel.Margin = WindowDecorationMargin;
+            };
             this.WhenActivated(action =>
             {
                 action(ViewModel!.NewProjectDialog.RegisterHandler(DialogHandler));
