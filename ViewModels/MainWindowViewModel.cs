@@ -87,6 +87,13 @@ namespace Panzerfaust.ViewModels
                 ? $"v{v.Major}.{v.Minor}.{v.Build}"
                 : "v?";
 
+        public bool IsRcBuild { get; } =
+            System.Reflection.Assembly.GetExecutingAssembly()
+                .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+                .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
+                .FirstOrDefault()?.InformationalVersion
+                    .Contains("-rc", StringComparison.OrdinalIgnoreCase) == true;
+
         private string _statusBarMessage = string.Empty;
         public string StatusBarMessage
         {
@@ -404,8 +411,6 @@ namespace Panzerfaust.ViewModels
             _polyHavenService = polyHavenService;
             _projectWindowVmFactory = projectWindowVmFactory;
             LoadSettings();
-            RefreshInstalledEngines();
-            ScanLocalAssets();
             LoadDownloadHistory();
 
             var filterPredicate = this.WhenAnyValue(x => x.SearchText)
@@ -424,7 +429,13 @@ namespace Panzerfaust.ViewModels
                 .ToCollection()
                 .Subscribe(col => ProjectCount = col.Count);
 
-            RxApp.MainThreadScheduler.Schedule(() => { _ = LoadProjectsAsync(); });
+            RxApp.MainThreadScheduler.Schedule(() =>
+            {
+                _ = RunBackgroundTask("Scan engines", () => Task.Run(RefreshInstalledEngines));
+                _ = RunBackgroundTask("Scan local assets", () => Task.Run(() =>
+                    Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(ScanLocalAssets)));
+                _ = RunBackgroundTask("Load projects", LoadProjectsAsync);
+            });
 
             var canConfirm = this.WhenAnyValue(
                 x => x.DeleteConfirmText,
