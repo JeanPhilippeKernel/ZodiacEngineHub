@@ -61,21 +61,45 @@ namespace Panzerfaust.Service
             List<string> engineArgs = new() { _projectFileCommandLineArgs, configPath, _launchEditorFlag, _launchEditorValue };
 
             var workingDir = Path.GetDirectoryName(engineBinaryPath) ?? _workingDirectory;
+            var engineRoot = Path.GetDirectoryName(workingDir) ?? workingDir;
+            var libDir = Path.Combine(engineRoot, "lib");
+
             var processStartInfo = new ProcessStartInfo(engineBinaryPath)
             {
                 UseShellExecute = false,
                 WorkingDirectory = workingDir
             };
+
+            // Extend the dynamic library search path so the engine finds its bundled dylibs
+            // even when the build rpath is stale (common with local dev builds).
+            var existing = processStartInfo.Environment.TryGetValue("DYLD_LIBRARY_PATH", out var cur) ? cur : "";
+            var extraPaths = string.Join(":", new[] { libDir, workingDir }.Where(Directory.Exists));
+            processStartInfo.Environment["DYLD_LIBRARY_PATH"] = string.IsNullOrEmpty(existing)
+                ? extraPaths
+                : $"{extraPaths}:{existing}";
             foreach (var arg in engineArgs)
                 processStartInfo.ArgumentList.Add(arg);
 
+            if (!File.Exists(engineBinaryPath))
+                throw new Exception($"Engine binary not found: {engineBinaryPath}");
+
+            if (!File.Exists(configPath))
+                throw new Exception($"Project config not found: {configPath}");
+
+            processStartInfo.RedirectStandardOutput = true;
+            processStartInfo.RedirectStandardError = true;
+
             var engineProcess = Process.Start(processStartInfo)!;
 
-            // WaitForInputIdle is Windows-only and only applies to GUI apps with a message pump.
-            // Give the process a short grace period then check for an immediate bad exit code.
-            await Task.Delay(300);
-            if (engineProcess.HasExited && engineProcess.ExitCode == -2)
-                throw new Exception("Failed to start the engine, invalid args");
+            // Wait up to 3s — long enough to catch fast crashes, short enough not to block.
+            var exited = await Task.Run(() => engineProcess.WaitForExit(3000));
+            if (exited)
+            {
+                var stderr = await engineProcess.StandardError.ReadToEndAsync();
+                var stdout = await engineProcess.StandardOutput.ReadToEndAsync();
+                var output = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
+                throw new Exception($"Engine exited (code {engineProcess.ExitCode}){(string.IsNullOrWhiteSpace(output) ? "" : $": {output.Trim()}")}");
+            }
         }
     }
 }
