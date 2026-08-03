@@ -1,26 +1,5 @@
 # Changelog
 
-## [1.4.0](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.3.0...v1.4.0) (2026-08-03)
-
-
-### Features
-
-* engine UX improvements and Linux startup fixes ([#32](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/32)) ([d41dae2](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/d41dae22b8802e197d2f8f85bc019844f0d4a91b))
-* RC build indicator with orange bloom border and version tag ([#28](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/28)) ([ec34bcb](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/ec34bcb230bec714bfd3317965c2b2210bf92186))
-
-
-### Bug Fixes
-
-* bump version to trigger RC build with orange border indicator ([#27](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/27)) ([7fada50](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/7fada506d65cdbde1700ec2557ddc520c2da4dfc))
-* pin Tmds.DBus.Protocol to 0.20.0 to fix Linux startup crash ([#31](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/31)) ([cf79d5e](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/cf79d5e5698e505dc2b217a3a98697cb73e43bfc))
-* restore Windows caption buttons and fix app version display ([#25](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/25)) ([7846204](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/784620441f95deb0f7103d69838fe3d86d794582))
-* surface engine crash errors and resolve stale rpath for local builds ([#30](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/30)) ([2d9c5db](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/2d9c5dba7c511352a42ff9e489c05bf09de646ee))
-
-
-### Documentation
-
-* **roadmap:** add roadmap with planned features and current implementation status ([#24](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/24)) ([d4638a2](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/d4638a2db75d086abd7f34bdd6ae5a31c39abce7))
-
 ## [1.3.0](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.2.0...v1.3.0) (2026-07-30)
 
 
