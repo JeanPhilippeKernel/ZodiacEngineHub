@@ -400,6 +400,7 @@ namespace Panzerfaust.ViewModels
         public ReactiveCommand<Unit, Unit> ToggleToastCommand { get; }
         public ReactiveCommand<Unit, Unit> ToggleTaskPanelCommand { get; }
         public ReactiveCommand<Unit, Unit> ClearCompletedTasksCommand { get; }
+        public ReactiveCommand<Unit, Unit> RefreshReleasesCommand { get; }
         public Interaction<ProjectWindowViewModel, ProjectViewModel?> NewProjectDialog { get; } = new();
         public Interaction<string, bool> DeleteProjectInteraction { get; } = new();
         public Interaction<string, bool> ConfirmOverwriteInteraction { get; } = new();
@@ -465,6 +466,9 @@ namespace Panzerfaust.ViewModels
                 foreach (var t in done) BackgroundTasks.Remove(t);
                 UpdateTaskCounts();
             });
+            RefreshReleasesCommand = ReactiveCommand.CreateFromTask(
+                FetchReleasesAsync,
+                this.WhenAnyValue(x => x.IsLoadingReleases).Select(loading => !loading));
             DeleteProjectInteraction.RegisterHandler(async ctx =>
             {
                 DeleteModalProjectName = ctx.Input;

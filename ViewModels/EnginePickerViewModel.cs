@@ -1,4 +1,5 @@
 using ReactiveUI;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -48,13 +49,26 @@ namespace Panzerfaust.ViewModels
             ApplyFilter();
         }
 
+        private static Version ParseVersion(string raw)
+        {
+            // Strip leading 'v' and any pre-release suffix before parsing
+            var s = raw.TrimStart('v');
+            var dashIdx = s.IndexOf('-');
+            if (dashIdx >= 0) s = s[..dashIdx];
+            return Version.TryParse(s, out var v) ? v : new Version(0, 0);
+        }
+
         private void ApplyFilter()
         {
             var term = _searchText.Trim();
+            var filtered = _allEngines
+                .Where(e => string.IsNullOrEmpty(term) || e.Version.Contains(term, StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(e => ParseVersion(e.Version))
+                .ThenByDescending(e => e.Version, StringComparer.OrdinalIgnoreCase);
+
             FilteredEngines.Clear();
-            foreach (var e in _allEngines)
-                if (string.IsNullOrEmpty(term) || e.Version.Contains(term, System.StringComparison.OrdinalIgnoreCase))
-                    FilteredEngines.Add(e);
+            foreach (var e in filtered)
+                FilteredEngines.Add(e);
 
             if (SelectedEngine == null || !FilteredEngines.Contains(SelectedEngine))
                 SelectedEngine = FilteredEngines.FirstOrDefault();
