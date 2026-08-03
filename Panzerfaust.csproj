@@ -10,10 +10,7 @@
 		<FileVersion>1.3.0</FileVersion>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 <ApplicationIcon>./Assets/avalonia-logo.ico</ApplicationIcon>
-		<BaseOutputPath Condition="$([MSBuild]::IsOSPlatform('Windows')) == 'true'">..\Result.Windows.x64.MultiConfig</BaseOutputPath>
-		<BaseOutputPath Condition="$([MSBuild]::IsOSPlatform('OSX')) == 'true' AND $(RuntimeIdentifier) == 'osx-arm64'">..\Result.Darwin.arm64.$(Configuration)</BaseOutputPath>
-		<BaseOutputPath Condition="$([MSBuild]::IsOSPlatform('OSX')) == 'true' AND $(RuntimeIdentifier) == 'osx-x64'">..\Result.Darwin.x64.$(Configuration)</BaseOutputPath>
-		<BaseOutputPath Condition="$([MSBuild]::IsOSPlatform('Linux')) == 'true'">..\Result.Linux.x64.$(Configuration)</BaseOutputPath>
+		<BaseOutputPath>bin</BaseOutputPath>
 		<Platforms>x64;arm64</Platforms>
 	</PropertyGroup>
 
@@ -82,25 +79,30 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Avalonia" Version="11.2.1"/>
-		<PackageReference Include="Avalonia.Desktop" Version="11.2.1"/>
-		<PackageReference Include="Avalonia.ReactiveUI" Version="11.2.1"/>
-		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1"/>
-		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1"/>
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2"/>
-		<PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5"/>
-		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.1"/>
-		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.1"/>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0"/>
-		<PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc2"/>
-		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0"/>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
-		<PackageReference Include="Tmds.DBus.Protocol" Version="0.94.2"/>
+		<PackageReference Include="Avalonia" Version="11.2.1" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="11.2.1" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+		<PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.1" />
+		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+		<PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc2" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<!-- Pinned to match Avalonia.FreeDesktop 11.2.1 which was compiled against this exact version.
+		     GHSA-xrw6-gwf8-vvr9 is fixed in 0.92.0 but upgrading breaks the Avalonia type binding at
+		     runtime. Remove this pin when upgrading Avalonia to a version that ships with 0.92.0+. -->
+		<PackageReference Include="Tmds.DBus.Protocol" Version="0.20.0">
+			<NoWarn>NU1903</NoWarn>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Assets\Images\coding_image.jpg"/>
-		<EmbeddedResource Include="Assets\Images\image_2.jpg"/>
+		<EmbeddedResource Include="Assets\Images\coding_image.jpg" />
+		<EmbeddedResource Include="Assets\Images\image_2.jpg" />
 	</ItemGroup>
 
 	<ItemGroup>
