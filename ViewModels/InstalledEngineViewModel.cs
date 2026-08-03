@@ -1,7 +1,10 @@
 using Panzerfaust.Models;
 using ReactiveUI;
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Reactive;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace Panzerfaust.ViewModels
@@ -22,11 +25,31 @@ namespace Panzerfaust.ViewModels
         public bool IsRc => RcPattern.IsMatch(_engine.Version);
 
         public ReactiveCommand<Unit, Unit> UninstallCommand { get; }
+        public ReactiveCommand<Unit, Unit> OpenLocationCommand { get; }
 
         public InstalledEngineViewModel(InstalledEngine engine, Func<InstalledEngineViewModel, System.Threading.Tasks.Task> uninstallHandler)
         {
             _engine = engine;
             UninstallCommand = ReactiveCommand.CreateFromTask(() => uninstallHandler(this));
+            OpenLocationCommand = ReactiveCommand.Create(OpenLocation);
+        }
+
+        private void OpenLocation()
+        {
+            try
+            {
+                var path = Directory.Exists(_engine.InstallPath)
+                    ? _engine.InstallPath
+                    : Path.GetDirectoryName(_engine.InstallPath) ?? _engine.InstallPath;
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    Process.Start("explorer.exe", path);
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    Process.Start("open", path);
+                else
+                    Process.Start("xdg-open", path);
+            }
+            catch { }
         }
     }
 }

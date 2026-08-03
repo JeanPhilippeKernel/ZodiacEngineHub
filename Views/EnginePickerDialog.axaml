@@ -7,9 +7,7 @@
         Width="420" SizeToContent="Height"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        SystemDecorations="BorderOnly"
-        TransparencyLevelHint="AcrylicBlur"
-        Background="Transparent">
+        Background="{DynamicResource WindowBackground}">
 
   <Border Background="{DynamicResource SidebarBackground}"
           BorderBrush="{DynamicResource SettingsGroupBackground}"

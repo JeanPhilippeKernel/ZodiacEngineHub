@@ -10,11 +10,10 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
         MinWidth="800" MinHeight="600"
         Width="1500" Height="800"
         Title="Panzerfaust"
-        TransparencyLevelHint="AcrylicBlur"
-        Background="Transparent"
+        Background="{DynamicResource WindowBackground}"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="PreferSystemChrome"
-        ExtendClientAreaTitleBarHeightHint="0">
+        ExtendClientAreaTitleBarHeightHint="-1">
 
   <Window.Styles>
     <Style Selector="Border.navMarker">
@@ -59,17 +58,9 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
     </Style>
   </Window.Styles>
 
-  <Panel>
+  <Panel x:Name="RootPanel">
 
-    <ExperimentalAcrylicBorder IsHitTestVisible="False">
-      <ExperimentalAcrylicBorder.Material>
-        <ExperimentalAcrylicMaterial BackgroundSource="Digger"
-                                     TintColor="{DynamicResource AcrylicTintColor}"
-                                     TintOpacity="6" MaterialOpacity="0.65"/>
-      </ExperimentalAcrylicBorder.Material>
-    </ExperimentalAcrylicBorder>
-
-    <Grid x:Name="RootContent" ColumnDefinitions="Auto, *, Auto" RowDefinitions="*, Auto">
+<Grid x:Name="RootContent" ColumnDefinitions="Auto, *, Auto" RowDefinitions="*, Auto">
 
       <!-- ══════════════════════════════════════
            Sidebar — Column 0
@@ -856,13 +847,19 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
                             <TextBlock Text="{Binding InstallPath}" FontSize="11" Opacity="0.45"
                                        TextTrimming="CharacterEllipsis"/>
                           </StackPanel>
-                          <Button Grid.Column="1"
-                                  Content="Uninstall"
-                                  Command="{Binding UninstallCommand}"
-                                  IsVisible="{Binding CanUninstall}"
-                                  FontSize="11" Padding="10,4" CornerRadius="4"
-                                  Background="#C42B1C" Foreground="White"
-                                  VerticalAlignment="Center"/>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <Button Content="Open Location"
+                                    Command="{Binding OpenLocationCommand}"
+                                    FontSize="11" Padding="10,4" CornerRadius="4"
+                                    Background="{DynamicResource SettingsGroupBackground}"
+                                    VerticalAlignment="Center"/>
+                            <Button Content="Uninstall"
+                                    Command="{Binding UninstallCommand}"
+                                    IsVisible="{Binding CanUninstall}"
+                                    FontSize="11" Padding="10,4" CornerRadius="4"
+                                    Background="#C42B1C" Foreground="White"
+                                    VerticalAlignment="Center"/>
+                          </StackPanel>
                         </Grid>
                       </Border>
                     </DataTemplate>
@@ -873,10 +870,18 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
 
             <Border Background="{DynamicResource SettingsGroupBackground}" CornerRadius="8" Padding="20,16">
               <StackPanel Spacing="14">
-                <StackPanel Spacing="2">
-                  <TextBlock Text="Available releases" FontSize="14" FontWeight="SemiBold" Opacity="0.6"/>
-                  <TextBlock Text="Select which engine version to download and use." FontSize="11" Opacity="0.5"/>
-                </StackPanel>
+                <Grid ColumnDefinitions="*, Auto">
+                  <StackPanel Grid.Column="0" Spacing="2">
+                    <TextBlock Text="Available releases" FontSize="14" FontWeight="SemiBold" Opacity="0.6"/>
+                    <TextBlock Text="Select which engine version to download and use." FontSize="11" Opacity="0.5"/>
+                  </StackPanel>
+                  <Button Grid.Column="1"
+                          Content="Fetch"
+                          Command="{Binding RefreshReleasesCommand}"
+                          FontSize="11" Padding="10,4" CornerRadius="4"
+                          Background="{DynamicResource SettingsGroupBackground}"
+                          VerticalAlignment="Center"/>
+                </Grid>
 
                 <TextBlock Text="Loading releases…"
                            FontSize="12" Opacity="0.55" TextAlignment="Center"
@@ -1159,13 +1164,19 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
                               <TextBlock Text="{Binding InstallPath}" FontSize="11" Opacity="0.45"
                                          TextTrimming="CharacterEllipsis"/>
                             </StackPanel>
-                            <Button Grid.Column="1"
-                                    Content="Uninstall"
-                                    Command="{Binding UninstallCommand}"
-                                    IsVisible="{Binding CanUninstall}"
-                                    FontSize="11" Padding="10,4" CornerRadius="4"
-                                    Background="#C42B1C" Foreground="White"
-                                    VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                              <Button Content="Open Location"
+                                      Command="{Binding OpenLocationCommand}"
+                                      FontSize="11" Padding="10,4" CornerRadius="4"
+                                      Background="{DynamicResource SettingsGroupBackground}"
+                                      VerticalAlignment="Center"/>
+                              <Button Content="Uninstall"
+                                      Command="{Binding UninstallCommand}"
+                                      IsVisible="{Binding CanUninstall}"
+                                      FontSize="11" Padding="10,4" CornerRadius="4"
+                                      Background="#C42B1C" Foreground="White"
+                                      VerticalAlignment="Center"/>
+                            </StackPanel>
                           </Grid>
                         </Border>
                       </DataTemplate>
@@ -1175,7 +1186,15 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
 
                 <Rectangle Height="1" Fill="{DynamicResource SettingsGroupBackground}"/>
 
-                <TextBlock Text="Available releases" FontSize="13" FontWeight="Medium"/>
+                <Grid ColumnDefinitions="*, Auto">
+                  <TextBlock Grid.Column="0" Text="Available releases" FontSize="13" FontWeight="Medium" VerticalAlignment="Center"/>
+                  <Button Grid.Column="1"
+                          Content="Fetch"
+                          Command="{Binding RefreshReleasesCommand}"
+                          FontSize="11" Padding="10,4" CornerRadius="4"
+                          Background="{DynamicResource SettingsGroupBackground}"
+                          VerticalAlignment="Center"/>
+                </Grid>
 
                 <TextBlock Text="Loading releases…"
                            FontSize="12" Opacity="0.55" TextAlignment="Center"
@@ -1549,6 +1568,21 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
       </Border>
 
     </Panel>
+
+    <!-- RC build indicator — orange glow border overlay, invisible in stable releases -->
+    <Border IsHitTestVisible="False"
+            BorderThickness="3"
+            CornerRadius="4"
+            BoxShadow="0 0 0 2 #CC6600, 0 0 12 4 #99FF8C00, 0 0 28 8 #55FF8C00"
+            IsVisible="{Binding IsRcBuild}">
+      <Border.BorderBrush>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+          <GradientStop Color="#FFAA00" Offset="0"/>
+          <GradientStop Color="#FF6600" Offset="0.5"/>
+          <GradientStop Color="#FFAA00" Offset="1"/>
+        </LinearGradientBrush>
+      </Border.BorderBrush>
+    </Border>
 
   </Panel>
 </Window>

@@ -8,7 +8,7 @@
       "preLaunchTask": "build-debug",
       "program": "${workspaceFolder}/bin/Debug/net10.0/Panzerfaust.dll",
       "windows": {
-        "program": "${workspaceFolder}/../Result.Windows.x64.MultiConfig/Debug/net10.0/Panzerfaust.dll"
+        "program": "${workspaceFolder}/bin/Debug/net10.0/Panzerfaust.dll"
       },
       "osx": {
         "program": "${workspaceFolder}/bin/Debug/net10.0/Panzerfaust.dll"
