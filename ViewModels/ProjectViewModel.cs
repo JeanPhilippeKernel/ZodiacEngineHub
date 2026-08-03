@@ -87,7 +87,8 @@ namespace Panzerfaust.ViewModels
             _preferredEngineVersion = p.PreferredEngineVersion;
             _name = p.Name;
             OpenProjectCommand = ReactiveCommand.CreateFromTask(OnOpenProjectCommand);
-            OpenProjectCommand.ThrownExceptions.Subscribe(_ => { });
+            OpenProjectCommand.ThrownExceptions.Subscribe(ex =>
+                MessageBus.Current.SendMessage<(string, string)>((Message.ToastErrorAction, $"Failed to open project: {ex.Message}")));
             DeleteProjectCommand = ReactiveCommand.CreateFromTask(OnDeleteProjectCommand);
             ShowInfoCommand = ReactiveCommand.Create(() =>
                 MessageBus.Current.SendMessage<(string, ProjectViewModel)>((Message.ShowInfoAction, this)));
