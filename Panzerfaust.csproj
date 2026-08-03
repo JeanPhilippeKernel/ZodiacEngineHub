@@ -101,8 +101,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Assets\Images\coding_image.jpg" />
-		<EmbeddedResource Include="Assets\Images\image_2.jpg" />
+		<EmbeddedResource Include="Assets\Images\coding_image.jpg"/>
+		<EmbeddedResource Include="Assets\Images\image_2.jpg"/>
 	</ItemGroup>
 
 	<ItemGroup>
