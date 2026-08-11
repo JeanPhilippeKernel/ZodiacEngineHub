@@ -39,22 +39,6 @@ namespace Panzerfaust.Models
         public string EnvironmentMapDirectory { get; set; } = "$(workingSpace)/Assets/EnvironmentMaps";
     }
 
-    internal class SkyConfig
-    {
-        // Supported values: "atmosphere", "hdri", "skySphere"
-        // atmosphere = procedural sky (default, no asset required)
-        // hdri       = equirectangular HDR image; environmentMap names the .zenvmap file
-        // skySphere  = simple gradient sky
-        [JsonPropertyName("mode")]
-        public string Mode { get; set; } = "atmosphere";
-
-        // Filename of the .zenvmap file inside assetDirs.environmentMapDir.
-        // Omitted when mode is "atmosphere" or "skySphere".
-        [JsonPropertyName("environmentMap")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? EnvironmentMap { get; set; } = null;
-    }
-
     internal class ProjectConfigJson
     {
         [JsonPropertyName("projectName")]
@@ -77,9 +61,6 @@ namespace Panzerfaust.Models
         // All asset import directories
         [JsonPropertyName("assetDirs")]
         public AssetDirectories AssetDirectories { get; set; } = new();
-
-        [JsonPropertyName("sky")]
-        public SkyConfig Sky { get; set; } = new();
 
         [JsonPropertyName("sceneList")]
         public IList<Scene> Scenes { get; set; } = new List<Scene> { new Scene() };
