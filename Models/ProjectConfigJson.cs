@@ -50,13 +50,8 @@ namespace Panzerfaust.Models
         [JsonPropertyName("workingSpace")]
         public string WorkingSpace { get; set; } = ".";
 
-        // Cooked scene files (.zescene)
         [JsonPropertyName("sceneDir")]
         public string SceneDirectory { get; set; } = "$(workingSpace)/Scenes";
-
-        // Cooked engine-format data (.zemesh, .zematerial, .zetextures)
-        [JsonPropertyName("sceneDataDir")]
-        public string SceneDataDirectory { get; set; } = "$(workingSpace)/SceneData";
 
         // All asset import directories
         [JsonPropertyName("assetDirs")]
