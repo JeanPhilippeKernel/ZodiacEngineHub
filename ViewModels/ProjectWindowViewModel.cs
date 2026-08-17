@@ -123,7 +123,6 @@ namespace Panzerfaust.ViewModels
             List<string> subDirectories = new()
             {
               "Scenes",
-              "SceneData",
               Path.Combine("Assets", "Textures"),
               Path.Combine("Assets", "Sounds"),
               Path.Combine("Assets", "Meshes"),
