@@ -27,6 +27,7 @@
 * ignore legacy non-conventional commits in commitlint ([#40](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/40)) ([60340d4](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/60340d4c97d3ff4c1a6aca063ee58e3dc95058c9))
 * restore commitlint check for all PRs ([#39](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/39)) ([38aada5](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/38aada553b8546514858e4139fcf02ee7ebc37a7))
 
+
 ## [1.3.0](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.2.0...v1.3.0) (2026-07-30)
 
 
