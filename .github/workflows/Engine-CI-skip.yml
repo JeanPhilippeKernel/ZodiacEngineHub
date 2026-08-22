@@ -17,17 +17,29 @@ jobs:
     steps:
       - run: echo "No source changes — skipping commitlint"
 
+  # Call reusable workflows with all options false so the nested check names
+  # (e.g. "windows / build-release / build-windows-x64-Release") appear as
+  # skipped — satisfying both develop's top-level and main's nested required checks.
   windows:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "No source changes — skipping Windows build"
+    uses: ./.github/workflows/windows-build.yml
+    with:
+      targetFramework: net10.0
+      run_debug: false
+      run_release: false
+      run_deploy: false
 
   macOS:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "No source changes — skipping macOS build"
+    uses: ./.github/workflows/macOS-build.yml
+    with:
+      targetFramework: net10.0
+      run_debug: false
+      run_release: false
+      run_deploy: false
 
   linux:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "No source changes — skipping Linux build"
+    uses: ./.github/workflows/linux-build.yml
+    with:
+      targetFramework: net10.0
+      run_debug: false
+      run_release: false
+      run_deploy: false
