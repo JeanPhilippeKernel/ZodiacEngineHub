@@ -102,8 +102,7 @@ namespace Panzerfaust.ViewModels
             // Creating projectConfig.json...
             Models.ProjectConfigJson content = new()
             {
-                ProjectName = ProjectName!,
-                DefautImportDirectory = new() { TextureDirectory = "Textures", SoundDirectory = "Sounds" }
+                ProjectName = ProjectName!
             };
 
             ProgressReportText = "Creating config json file...";
@@ -120,13 +119,16 @@ namespace Panzerfaust.ViewModels
                 await writer.WriteAsync(jsonContent);
             }
 
-            // Creating sub directories...            
+            // Creating sub directories...
             List<string> subDirectories = new()
             {
-              content.SceneDataDirectory,
-              content.SceneDirectory,
-              content.DefautImportDirectory.SoundDirectory,
-              content.DefautImportDirectory.TextureDirectory
+              "Scenes",
+              Path.Combine("Assets", "Textures"),
+              Path.Combine("Assets", "Sounds"),
+              Path.Combine("Assets", "Meshes"),
+              Path.Combine("Assets", "Materials"),
+              Path.Combine("Assets", "Sprites"),
+              Path.Combine("Assets", "EnvironmentMaps")
             };
 
             foreach (var directory in subDirectories)

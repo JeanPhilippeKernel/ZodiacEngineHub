@@ -1,5 +1,5 @@
 export default {
-    ignores: [(commit) => /^(Merge|Sync\/)/.test(commit)],
+    ignores: [(commit) => /^(Merge|Sync\/|Release\/|Chore:|Fix\/)/.test(commit)],
     rules: {
         'type-enum': [
             2,
