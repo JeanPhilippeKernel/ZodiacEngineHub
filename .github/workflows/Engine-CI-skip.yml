@@ -1,0 +1,33 @@
+name: Panzerfaust CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths-ignore:
+      - '**.cs'
+      - '**.axaml'
+      - '**.csproj'
+      - '**.manifest'
+      - '.github/workflows/**'
+
+jobs:
+  commitlint:
+    if: github.base_ref != 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No source changes — skipping commitlint"
+
+  windows:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No source changes — skipping Windows build"
+
+  macOS:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No source changes — skipping macOS build"
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "No source changes — skipping Linux build"
