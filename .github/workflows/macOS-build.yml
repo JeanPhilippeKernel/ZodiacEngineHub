@@ -21,7 +21,7 @@ jobs:
     if: ${{ inputs.run_debug }}
     strategy:
       matrix:
-        architecture: [x64, arm64]
+        architecture: [arm64]
     uses: ./.github/workflows/job-build-macOS.yml
     with:
       configuration: Debug
@@ -32,7 +32,7 @@ jobs:
     if: ${{ inputs.run_release || inputs.run_deploy }}
     strategy:
       matrix:
-        architecture: [x64, arm64]
+        architecture: [arm64]
     uses: ./.github/workflows/job-build-macOS.yml
     with:
       configuration: Release
@@ -44,7 +44,7 @@ jobs:
     if: ${{ inputs.run_deploy }}
     strategy:
       matrix:
-        architecture: [x64, arm64]
+        architecture: [arm64]
     uses: ./.github/workflows/job-deploy-macOS.yml
     with:
       configuration: Release

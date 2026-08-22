@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,46 +16,47 @@ namespace Panzerfaust.Models
         public bool IsDefault { get; set; } = true;
     }
 
-    internal class ImportDirectory
+    // All user-facing asset directories live under $(workingSpace)/Assets/.
+    // Paths use the $(workingSpace) token, expanded at engine runtime.
+    internal class AssetDirectories
     {
-        private string _defaultName = "Imported";
-        private string _textureDirectory = string.Empty;
-        private string _soundDirectory = string.Empty;
-
         [JsonPropertyName("textureDir")]
-        public string TextureDirectory
-        {
-            get => _textureDirectory;
-            set
-            {
-                _textureDirectory = Path.Combine(_defaultName, value);                
-            }
-        }
+        public string TextureDirectory { get; set; } = "$(workingSpace)/Assets/Textures";
+
         [JsonPropertyName("soundDir")]
-        public string SoundDirectory
-        {
-            get => _soundDirectory;
-            set
-            {
-                _soundDirectory = Path.Combine(_defaultName, value);
-            }
-        }
+        public string SoundDirectory { get; set; } = "$(workingSpace)/Assets/Sounds";
+
+        [JsonPropertyName("meshDir")]
+        public string MeshDirectory { get; set; } = "$(workingSpace)/Assets/Meshes";
+
+        [JsonPropertyName("materialDir")]
+        public string MaterialDirectory { get; set; } = "$(workingSpace)/Assets/Materials";
+
+        [JsonPropertyName("spriteDir")]
+        public string SpriteDirectory { get; set; } = "$(workingSpace)/Assets/Sprites";
+
+        [JsonPropertyName("environmentMapDir")]
+        public string EnvironmentMapDirectory { get; set; } = "$(workingSpace)/Assets/EnvironmentMaps";
     }
 
     internal class ProjectConfigJson
     {
         [JsonPropertyName("projectName")]
         public string ProjectName { get; set; } = string.Empty;
+
         [JsonPropertyName("version")]
         public string Version { get; set; } = "1.0.0";
+
         [JsonPropertyName("workingSpace")]
         public string WorkingSpace { get; set; } = ".";
+
         [JsonPropertyName("sceneDir")]
-        public string SceneDirectory { get; set; } = "Scenes";
-        [JsonPropertyName("sceneDataDir")]
-        public string SceneDataDirectory { get; set; } = "SceneData";
-        [JsonPropertyName("defaultImportDir")]
-        public ImportDirectory DefautImportDirectory { get; set; } = new();
+        public string SceneDirectory { get; set; } = "$(workingSpace)/Scenes";
+
+        // All asset import directories
+        [JsonPropertyName("assetDirs")]
+        public AssetDirectories AssetDirectories { get; set; } = new();
+
         [JsonPropertyName("sceneList")]
         public IList<Scene> Scenes { get; set; } = new List<Scene> { new Scene() };
 
