@@ -25,7 +25,7 @@ jobs:
       - name: Resolve version
         id: version
         run: |
-          git fetch --tags --quiet
+          git fetch --tags --quiet || true
           TAG="$(git tag --points-at HEAD | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)"
           echo "informational_version=${TAG#v}" >> "$GITHUB_OUTPUT"
 
