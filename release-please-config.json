@@ -19,9 +19,6 @@
                 {"type": "fix",      "section": "Bug Fixes"},
                 {"type": "perf",     "section": "Performance"},
                 {"type": "refactor", "section": "Refactors"},
-                {"type": "docs",     "section": "Documentation"},
-                {"type": "build",    "section": "Build System"},
-                {"type": "ci",       "section": "CI/CD"},
                 {"type": "revert",   "section": "Reverts"}
             ]
         }
