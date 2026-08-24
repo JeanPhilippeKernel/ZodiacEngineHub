@@ -441,6 +441,7 @@ namespace Panzerfaust.ViewModels
                 _ = RunBackgroundTask("Scan local assets", () => Task.Run(() =>
                     Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(ScanLocalAssets)));
                 _ = RunBackgroundTask("Load projects", LoadProjectsAsync);
+                _ = Task.Run(MigrateAssetFoldersAsync);
             });
 
             var canConfirm = this.WhenAnyValue(
@@ -998,6 +999,49 @@ namespace Panzerfaust.ViewModels
 
             this.RaisePropertyChanged(nameof(HasLocalAssets));
             RefreshDownloadedStates();
+        }
+
+        private async Task MigrateAssetFoldersAsync()
+        {
+            var root = Models.AppPaths.Assets;
+            if (!Directory.Exists(root)) return;
+
+            string[] imageExts = ["jpg", "jpeg", "png", "webp", "hdr", "exr"];
+
+            // Collect all flat image files that need moving
+            var toMove = new List<(string Src, string Dest)>();
+            foreach (var assetDir in Directory.EnumerateDirectories(root))
+            foreach (var resDir in Directory.EnumerateDirectories(assetDir))
+            {
+                foreach (var file in Directory.EnumerateFiles(resDir))
+                {
+                    var ext = Path.GetExtension(file).TrimStart('.').ToLowerInvariant();
+                    if (!imageExts.Contains(ext)) continue;
+                    var dest = Path.Combine(resDir, "textures", Path.GetFileName(file));
+                    if (!File.Exists(dest))
+                        toMove.Add((file, dest));
+                }
+            }
+
+            if (toMove.Count == 0) return;
+
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                _ = ShowToastAsync($"Migrating {toMove.Count} texture file(s) into textures/ folders…"));
+
+            var moved = 0;
+            foreach (var (src, dest) in toMove)
+            {
+                try
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
+                    File.Move(src, dest, overwrite: true);
+                    moved++;
+                }
+                catch { /* non-fatal — leave file in place */ }
+            }
+
+            await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() =>
+                _ = ShowToastAsync($"Asset folders updated — {moved} texture(s) moved to textures/"));
         }
 
         private void RefreshDownloadedStates()
