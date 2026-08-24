@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
-    "target-branch": "main",
+    "target-branch": "develop",
     "bump-minor-pre-major": true,
     "pull-request-title-pattern": "chore: release ${version}",
     "packages": {
