@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.1](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.6.0...v1.6.1) (2026-08-24)
+
+
+### Documentation
+
+* update release process for develop-targeted flow ([#69](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/69)) ([bae00e3](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/bae00e32c6feaa1fbfbbdc7e6c8f7c0a6e12bf70))
+
+
+### CI/CD
+
+* add ci-passed summary check to unify required status checks ([#70](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/70)) ([d398d1f](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/d398d1f6f101f4e950e075dd1958767e266ffa4b))
+
 ## [1.6.0](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.5.0...v1.6.0) (2026-08-24)
 
 
