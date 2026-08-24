@@ -877,7 +877,7 @@ namespace Panzerfaust.ViewModels
                                                     {
                                                         var incUrl = incFile["url"]?.GetValue<string>() ?? string.Empty;
                                                         if (!string.IsNullOrEmpty(incUrl))
-                                                            option.CompanionUrls.Add(incUrl);
+                                                            option.CompanionFiles.Add((inc.Key, incUrl));
                                                     }
                                                 }
                                             }
@@ -943,14 +943,17 @@ namespace Panzerfaust.ViewModels
                     await DownloadFileWithProgressAsync(fmt.Url, destPath,
                         pct => UI(() => { op.Progress = pct; }));
 
-                    // Download companion files (e.g. .bin buffer for GLTF)
+                    // Download companion files, preserving the relative path from the API
+                    // (e.g. "textures/foo_diff_4k.jpg" → destDir/textures/foo_diff_4k.jpg)
                     var destDir2 = System.IO.Path.GetDirectoryName(destPath)!;
-                    foreach (var companionUrl in fmt.CompanionUrls)
+                    foreach (var (relativePath, companionUrl) in fmt.CompanionFiles)
                     {
                         try
                         {
-                            var companionFileName = System.IO.Path.GetFileName(new Uri(companionUrl).LocalPath);
-                            var companionDest = System.IO.Path.Combine(destDir2, companionFileName);
+                            var companionDest = System.IO.Path.Combine(
+                                destDir2,
+                                relativePath.Replace('/', System.IO.Path.DirectorySeparatorChar));
+                            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(companionDest)!);
                             await DownloadFileWithProgressAsync(companionUrl, companionDest, _ => Task.CompletedTask);
                         }
                         catch { /* non-fatal */ }

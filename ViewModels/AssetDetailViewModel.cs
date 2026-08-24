@@ -13,7 +13,8 @@ namespace Panzerfaust.ViewModels
         public string Resolution { get; }
         public string Url { get; }
         public string Label => $"{Format.ToUpperInvariant()} · {Resolution}";
-        public List<string> CompanionUrls { get; } = new();
+        // RelativePath is the inc.Key from the Poly Haven API (e.g. "textures/foo_diff_4k.jpg", "foo.bin")
+        public List<(string RelativePath, string Url)> CompanionFiles { get; } = new();
 
         private bool _isSelected;
         public bool IsSelected
