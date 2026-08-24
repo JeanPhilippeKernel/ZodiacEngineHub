@@ -78,7 +78,7 @@ mc:Ignorable="d" d:DesignWidth="1500" d:DesignHeight="800"
 
         <Grid Grid.Row="0" Height="56" ColumnDefinitions="*, Auto" Margin="4,8,4,0">
           <TextBlock Grid.Column="0"
-                     Text="Panzerfaust"
+                     Text="Zodiac Hub"
                      FontWeight="DemiBold" FontSize="15"
                      VerticalAlignment="Center" Margin="12,0,0,0"
                      IsVisible="{Binding IsSidebarExpanded}"/>
