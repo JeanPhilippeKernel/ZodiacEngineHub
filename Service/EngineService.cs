@@ -37,11 +37,22 @@ namespace Panzerfaust.Service
 
             var binaryName = $"{_launcherCLIAppName}{EngineExtension}";
 
-            foreach (var versionDir in Directory.EnumerateDirectories(installLocation))
+            IEnumerable<string> versionDirs;
+            try { versionDirs = Directory.EnumerateDirectories(installLocation).ToList(); }
+            catch (UnauthorizedAccessException) { yield break; }
+            catch (IOException) { yield break; }
+
+            foreach (var versionDir in versionDirs)
             {
-                var binaryPath = Directory
-                    .EnumerateFiles(versionDir, binaryName, SearchOption.AllDirectories)
-                    .FirstOrDefault();
+                string? binaryPath = null;
+                try
+                {
+                    binaryPath = Directory
+                        .EnumerateFiles(versionDir, binaryName, SearchOption.AllDirectories)
+                        .FirstOrDefault();
+                }
+                catch (UnauthorizedAccessException) { }
+                catch (IOException) { }
 
                 if (binaryPath != null)
                     yield return new InstalledEngine
