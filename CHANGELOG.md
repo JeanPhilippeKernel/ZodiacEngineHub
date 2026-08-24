@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.5.1](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.5.0...v1.5.1) (2026-08-24)
+
+
+### CI/CD
+
+* fix tag_name priority for workflow_dispatch releases ([#62](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/62)) ([4cbc7cf](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/4cbc7cf4759116a49f678166dcbff7734bdb1603))
+* pass target-branch: main to release-please action ([#56](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/56)) ([611d508](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/611d508736948da941bc1b68208c79d8ec2492e4))
+* tolerate git fetch --tags failure on shallow clones ([#59](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/59)) ([47a814c](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/47a814cd0f7996f579b4ed9f474f45f0397ed1de))
+
 ## [1.5.0](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.4.0...v1.5.0) (2026-08-22)
 
 
