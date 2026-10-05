@@ -39,6 +39,38 @@ namespace Panzerfaust.Models
         public string EnvironmentMapDirectory { get; set; } = "$(workingSpace)/Assets/EnvironmentMaps";
     }
 
+    internal class SkyDefaults
+    {
+        [JsonPropertyName("mode")]
+        public string Mode { get; set; } = "atmosphere";
+
+        [JsonPropertyName("environmentMap")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Guid? EnvironmentMap { get; set; }
+
+        [JsonPropertyName("environmentIntensity")]
+        public float EnvironmentIntensity { get; set; } = 1.0f;
+
+        [JsonPropertyName("environmentTint")]
+        public float[] EnvironmentTint { get; set; } = new[] { 1.0f, 1.0f, 1.0f, 1.0f };
+
+        [JsonPropertyName("environmentYawRadians")]
+        public float EnvironmentYawRadians { get; set; } = 0.0f;
+    }
+
+    internal class RenderingSettings
+    {
+        [JsonPropertyName("environment_lighting_quality")]
+        public string EnvironmentLightingQuality { get; set; } = "standard";
+
+        [JsonPropertyName("environment_lighting_budget_mb")]
+        public int EnvironmentLightingBudgetMb { get; set; } = 384;
+
+        // Preserve other rendering policies when a configuration is round-tripped.
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement>? AdditionalProperties { get; set; }
+    }
+
     internal class ProjectConfigJson
     {
         [JsonPropertyName("projectName")]
@@ -59,6 +91,12 @@ namespace Panzerfaust.Models
 
         [JsonPropertyName("sceneList")]
         public IList<Scene> Scenes { get; set; } = new List<Scene> { new Scene() };
+
+        [JsonPropertyName("skyDefaults")]
+        public SkyDefaults SkyDefaults { get; set; } = new();
+
+        [JsonPropertyName("rendering")]
+        public RenderingSettings Rendering { get; set; } = new();
 
         public string ToJson() => JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
     }
