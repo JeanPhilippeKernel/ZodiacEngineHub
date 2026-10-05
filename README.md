@@ -80,6 +80,8 @@ See [Contributing.md](Contributing.md) for commit conventions, branch rules, and
 
 For local development with a custom engine build, see [docs/local-engine-path.md](docs/local-engine-path.md).
 
+For generated sky defaults and environment-lighting settings, see [docs/project-configuration.md](docs/project-configuration.md).
+
 ---
 
 ## License
