@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.6.0...v1.7.0) (2026-10-05)
+
+
+### Features
+
+* **project:** generate sky and environment lighting defaults ([#77](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/issues/77)) ([5abddc8](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/commit/5abddc83afa643d63814dd7b25d32c7c08682b42))
+
 ## [1.6.0](https://github.com/JeanPhilippeKernel/ZodiacEngineHub/compare/v1.5.0...v1.6.0) (2026-08-24)
 
 
