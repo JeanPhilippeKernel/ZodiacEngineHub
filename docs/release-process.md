@@ -1,90 +1,66 @@
 # Release Process
 
-Panzerfaust uses two branches and [Release Please](https://github.com/googleapis/release-please) to automate versioning and publishing.
+Panzerfaust uses [Release Please](https://github.com/googleapis/release-please) and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) to automate versioning and publishing. All releases — RC and stable — are driven from `develop`. No manual version bumping, no develop → main merge dance.
 
-| Branch | Track | Example tag |
-|---|---|---|
-| `develop` | Pre-release (RC) | `v1.2.0-rc.1` |
-| `main` | Stable | `v1.2.0` |
+---
 
-All automation is driven by [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). No manual version bumping.
+## Branches
+
+| Branch | Purpose |
+|---|---|
+| `develop` | Default branch. All development, all releases. |
+| `main` | Read-only mirror of the last stable release. Updated manually after each stable if desired. |
 
 ---
 
 ## Day-to-day development
 
-Contributors open PRs against `develop`. Once merged, Release Please on `develop` automatically opens or updates a **Pre-release PR** that accumulates the pending version bump and changelog entries.
+Open PRs against `develop`. Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) in your PR title:
+
+```
+feat(scope): add something new        → minor bump
+fix(scope): correct a bug             → patch bump
+feat!: breaking change                → major bump
+ci/docs/chore: housekeeping           → no bump
+```
 
 ---
 
 ## Cutting a pre-release (RC)
 
-1. Review the open Release Please PR on `develop` (titled `chore: release X.Y.Z-rc.N`).
-2. Check the changelog entries look correct.
+The pre-release pipeline runs automatically on every push to `develop`. No action needed — if the push contains releasable commits, a new `vX.Y.Z-rc.N` tag is created and a GitHub Pre-release is published with build artifacts.
+
+---
+
+## Cutting a stable release
+
+1. Review the open Release Please PR on `develop` (titled `chore: release X.Y.Z`).
+2. Check the changelog looks correct.
 3. Merge the PR.
 
 Release Please then:
-- Bumps `VERSION.txt` to e.g. `1.2.0-rc.1`
-- Creates tag `v1.2.0-rc.1`
-- Publishes a GitHub Pre-release with build artifacts for all platforms
+- Bumps `VERSION.txt` and `Panzerfaust.csproj` to `X.Y.Z`
+- Updates `CHANGELOG.md`
+- Creates tag `vX.Y.Z` on `develop`
+- Publishes a GitHub Release with artifacts for Windows, macOS arm64, and Linux
 
-Subsequent merges to `develop` before a stable release increment the counter: `rc.1` → `rc.2` → …
-
----
-
-## Promoting to stable
-
-Once `develop` is ready to ship:
-
-1. Open a PR from `develop` → `main`.
-2. Get it reviewed and merge it.
-3. Release Please on `main` opens a **Stable Release PR** (titled `chore: release X.Y.Z`).
-4. Review and merge that PR.
-
-Release Please then:
-- Bumps `VERSION.txt` to e.g. `1.2.0`
-- Creates tag `v1.2.0`
-- Publishes a GitHub Release (stable) with build artifacts
+That's it. No other steps required.
 
 ---
 
-## Syncing `develop` after a stable release
-
-After the stable Release PR merges to `main`, `develop` is behind by the version bump commit. Sync it:
-
-```sh
-git checkout develop
-git fetch origin
-git merge origin/main
-git push origin develop
-```
-
-This keeps `VERSION.txt` and `CHANGELOG.md` consistent on both branches.
-
----
-
-## Hotfix on stable
+## Hotfix
 
 For urgent fixes that cannot wait for the next RC cycle:
 
-1. Branch off `main`: `git checkout -b fix/<description> main`
+1. Branch off `develop`: `git checkout -b fix/<description> develop`
 2. Apply the fix with a `fix:` commit.
-3. Open a PR against `main` directly.
-4. Merge — Release Please opens a patch release PR (`v1.2.1`).
-5. Merge the release PR.
-6. Back-port to `develop`:
-
-```sh
-git checkout develop
-git cherry-pick <fix-commit-sha>
-git push origin develop
-```
+3. Open a PR against `develop`.
+4. Merge — Release Please updates the pending release PR with the fix.
+5. Merge the Release Please PR to ship the patch release.
 
 ---
 
 ## Version bump rules
-
-The version bump is determined automatically from commit types since the last release:
 
 | Commit type | Bump |
 |---|---|
