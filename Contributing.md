@@ -5,7 +5,7 @@ When contributing to this repository, please first discuss the change you wish t
 
 ## Branch target
 
-**All pull requests must target the `develop` branch.** Direct PRs to `main` are not accepted — `main` is updated only through the release process.
+**All pull requests must target the `develop` branch.** `main` is a read-only mirror of the last stable release and is never pushed to directly.
 
 ## Rules
 
@@ -96,32 +96,7 @@ This installs a `commit-msg` hook that validates conventional commits format loc
 
 ## Release Process
 
-Panzerfaust has two release tracks, both fully automated from commit messages.
-
-### Stable releases (`main`)
-
-Merges into `main` are picked up by Release Please, which opens a **Release PR** accumulating all changes since the last stable tag. When that PR is merged:
-
-- `VERSION.txt` is bumped (`0.3.0` → `0.3.1` / `0.4.0` / `1.0.0`) based on commit types
-- A tag `v0.3.1` is created
-- A GitHub Release is published with build artifacts for all platforms
-
-### Pre-releases (`develop`)
-
-Pushes to `develop` follow the same process but produce rc versions:
-
-- Release Please opens a **Pre-release PR** on `develop`
-- When merged: `VERSION.txt` is set to e.g. `0.4.0-rc.1`, tag `v0.4.0-rc.1` is created
-- A GitHub Pre-release is published (marked as pre-release in the GitHub UI)
-- Each subsequent batch of commits increments the rc counter: `rc.1` → `rc.2` → …
-
-### Promoting a pre-release to stable
-
-Once `develop` is stable enough to ship:
-
-1. Open a PR from `develop` → `main`
-2. Merge it — Release Please on `main` sees all the accumulated `feat:`/`fix:` commits and opens a stable Release PR
-3. Merge the Release PR → `v0.4.0` stable is tagged and published
+See **[docs/release-process.md](docs/release-process.md)** for the full release workflow.
 
 ## Pull Request Process
 
